@@ -7,4 +7,5 @@ data class UserDto(val id:Long,
                    val followers: Int,
                    val following: Int,
                    val posts: Int,
+                   val profilePictureUrl: String,
                    val instrumentsPlayed: List<String>)
