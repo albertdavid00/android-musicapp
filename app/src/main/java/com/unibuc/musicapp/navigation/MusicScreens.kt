@@ -6,7 +6,26 @@ enum class MusicScreens {
     FeedScreen,
     ProfileScreen,
     SearchScreen,
-    FollowScreen;
+    UsersScreen;
+
+    fun routeWithParameters(param1: String? = null, param2: String? = null): String {
+        return when (this) {
+            UsersScreen -> {
+                when {
+                    param1 != null && param2 != null -> "$name/$param1/$param2"
+                    param1 != null -> "$name/$param1"
+                    else -> name
+                }
+            }
+            ProfileScreen -> {
+                when {
+                    param1 != null -> "$name/$param1"
+                    else -> name
+                }
+            }
+            else -> name
+        }
+    }
 
     companion object {
         fun fromRoute(route: String?): MusicScreens
@@ -15,7 +34,7 @@ enum class MusicScreens {
             ProfileScreen.name -> ProfileScreen
             LoginScreen.name -> LoginScreen
             RegisterScreen.name -> RegisterScreen
-            FollowScreen.name -> FollowScreen
+            UsersScreen.name -> UsersScreen
 
 
             null -> FeedScreen

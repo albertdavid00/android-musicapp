@@ -8,4 +8,5 @@ data class UserDto(val id:Long,
                    val following: Int,
                    val posts: Int,
                    val profilePictureUrl: String,
-                   val instrumentsPlayed: List<String>)
+                   val instrumentsPlayed: List<String>,
+                   val isFollowedByCurrentUser: Boolean)

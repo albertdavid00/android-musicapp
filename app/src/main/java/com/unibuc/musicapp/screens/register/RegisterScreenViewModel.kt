@@ -9,6 +9,8 @@ import com.unibuc.musicapp.dto.RegisterDto
 import com.unibuc.musicapp.network.MusicApi
 import com.unibuc.musicapp.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -22,10 +24,13 @@ class RegisterScreenViewModel @Inject constructor(
     private val api: MusicApi,
 ): ViewModel()  {
 
+    private val _isRegistering = MutableStateFlow(false)
+    val isRegistering: StateFlow<Boolean> = _isRegistering
 
     fun register(registerDto: RegisterDto, toLogin: () -> Unit) {
         viewModelScope.launch {
             try{
+                _isRegistering.value = true
                 Log.d("Register", "Register " + registerDto.email)
                 val email = registerDto.email.toRequestBody("text/plain".toMediaTypeOrNull())
                 val password = registerDto.password.toRequestBody("text/plain".toMediaTypeOrNull())
@@ -40,6 +45,8 @@ class RegisterScreenViewModel @Inject constructor(
                 Log.d("Register", e.response()?.errorBody()?.string()!!)
             } catch (e: Exception) {
                 Log.d("Register", e.message.toString())
+            } finally {
+                _isRegistering.value = false
             }
         }
     }
