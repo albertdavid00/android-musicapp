@@ -5,7 +5,7 @@ enum class MusicScreens {
     RegisterScreen,
     FeedScreen,
     ProfileScreen,
-    SearchScreen,
+    CreatePostScreen,
     UsersScreen;
 
     fun routeWithParameters(param1: String? = null, param2: String? = null): String {
@@ -35,6 +35,7 @@ enum class MusicScreens {
             LoginScreen.name -> LoginScreen
             RegisterScreen.name -> RegisterScreen
             UsersScreen.name -> UsersScreen
+            CreatePostScreen.name -> CreatePostScreen
 
 
             null -> FeedScreen

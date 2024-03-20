@@ -93,6 +93,13 @@ dependencies {
     //JWT
     implementation ("com.auth0.android:jwtdecode:2.0.1")
     implementation ("androidx.compose.runtime:runtime-livedata")
+
+    //ExoPlayer
+    implementation("androidx.media3:media3-exoplayer:1.3.0")
+    implementation("androidx.media3:media3-ui:1.3.0")
+
+    //FFMPEG
+    implementation("com.arthenica:ffmpeg-kit-full-gpl:4.5.1-1")
 }
 // Allow references to generated code
 kapt {

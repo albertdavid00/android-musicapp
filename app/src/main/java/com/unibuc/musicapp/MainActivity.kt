@@ -16,6 +16,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Home
@@ -120,32 +121,41 @@ fun MusicApp(loginViewModel: LoginViewModel = hiltViewModel()) {
                 BottomNavigation(backgroundColor = MaterialTheme.colorScheme.primary) {
 
                     BottomNavigationItem(
+                        icon = { Icon(Icons.Filled.Home,
+                            contentDescription = "Feed",
+                            tint = if (currentRoute == MusicScreens.FeedScreen.name)
+                                MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+                        )},
+                        selected = currentRoute == MusicScreens.FeedScreen.name,
+                        onClick = { navController.navigate(MusicScreens.FeedScreen.name) }
+                    )
+
+                    BottomNavigationItem(
                         icon = { Icon(Icons.Filled.Search,
                             contentDescription = "Search",
                             tint = if (currentRoute == MusicScreens.UsersScreen.name)
                                 MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
                         )},
-                        //label = { Text("Login") },
                         selected = currentRoute == MusicScreens.UsersScreen.name,
                         onClick = { navController.navigate(MusicScreens.UsersScreen.name) }
                     )
 
                     BottomNavigationItem(
-                        icon = { Icon(Icons.Filled.Home,
-                            contentDescription = "Feed",
-                            tint = if (currentRoute == MusicScreens.FeedScreen.name)
+                        icon = { Icon(Icons.Filled.AddCircle,
+                            contentDescription = "Search",
+                            tint = if (currentRoute == MusicScreens.CreatePostScreen.name)
                                 MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
-                            )},
-                        //label = { Text("Login") },
-                        selected = currentRoute == MusicScreens.FeedScreen.name,
-                        onClick = { navController.navigate(MusicScreens.FeedScreen.name) }
+                        )},
+                        selected = currentRoute == MusicScreens.CreatePostScreen.name,
+                        onClick = { navController.navigate(MusicScreens.CreatePostScreen.name) }
                     )
+
+
                     BottomNavigationItem(
                         icon = { Icon(Icons.Filled.Person,
                             contentDescription = "Profile",
                             tint = if (currentRoute == MusicScreens.ProfileScreen.name)
                                 MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface) },
-                        //label = { Text("Register") },
                         selected = currentRoute == MusicScreens.ProfileScreen.name,
                         onClick = { navController.navigate( MusicScreens.ProfileScreen
                             .name) }

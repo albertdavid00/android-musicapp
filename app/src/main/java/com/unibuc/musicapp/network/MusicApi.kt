@@ -1,7 +1,7 @@
 package com.unibuc.musicapp.network
 
 import com.unibuc.musicapp.dto.LoginDto
-import com.unibuc.musicapp.dto.RegisterDto
+import com.unibuc.musicapp.dto.PostDto
 import com.unibuc.musicapp.dto.TokenDto
 import com.unibuc.musicapp.dto.UserDto
 import okhttp3.MultipartBody
@@ -53,4 +53,12 @@ interface MusicApi {
 
     @GET("/users/search")
     suspend fun filterUsers(@Header("Authorization") accessToken: String, @Query("searchQuery") searchQuery: String): List<UserDto>
+    @Multipart
+    @POST("/posts")
+    suspend fun uploadPost(@Header("Authorization") accessToken: String,
+                           @Part("description") description: RequestBody,
+                           @Part("visibility") visibility: RequestBody,
+                           @Part videoPart: MultipartBody.Part): Long
+    @POST("/posts/upload")
+    suspend fun uploadPost(@Header("Authorization") accessToken: String, @Body postDto: PostDto): Long
 }

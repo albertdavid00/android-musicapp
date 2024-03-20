@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.unibuc.musicapp.screens.feed.FeedScreen
 import com.unibuc.musicapp.screens.login.LoginScreen
+import com.unibuc.musicapp.screens.post.CreatePostScreen
 import com.unibuc.musicapp.screens.profile.ProfileScreen
 import com.unibuc.musicapp.screens.register.RegisterScreen
 import com.unibuc.musicapp.screens.users.UsersScreen
@@ -23,8 +24,8 @@ fun MusicNavigation(navController: NavHostController) {
         composable(MusicScreens.RegisterScreen.name) {
             RegisterScreen(navController)
         }
-        composable(MusicScreens.SearchScreen.name) {
-            LoginScreen(navController)
+        composable(MusicScreens.CreatePostScreen.name) {
+            CreatePostScreen(navController)
         }
         composable(
             route = MusicScreens.UsersScreen.routeWithParameters("{followParam}", "{userId}")

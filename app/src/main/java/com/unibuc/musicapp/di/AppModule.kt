@@ -10,8 +10,10 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
@@ -27,6 +29,11 @@ object AppModule {
     fun provideMusicApi(): MusicApi {
         return Retrofit.Builder()
             .baseUrl(Constants.BASE_URL)
+            .client(OkHttpClient.Builder()
+                .connectTimeout(50, TimeUnit.SECONDS)
+                .writeTimeout(50, TimeUnit.SECONDS)
+                .readTimeout(50, TimeUnit.SECONDS)
+                .build())
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(MusicApi::class.java)
