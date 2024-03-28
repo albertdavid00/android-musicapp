@@ -1,6 +1,8 @@
 package com.unibuc.musicapp.components
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -37,6 +39,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import coil.compose.rememberAsyncImagePainter
+import java.time.Duration
+import java.time.Instant
 
 @Composable
 fun EmailInput(
@@ -193,6 +197,37 @@ fun ImageDialog(imageUrl: String, onDismiss: () -> Unit) {
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop
             )
+        }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun timeFromNow(instant: Instant): String {
+    val now = Instant.now()
+    val duration = Duration.between(instant, now)
+    return when {
+        duration.toDays() >= 7 -> "${duration.toDays() / 7}w"
+        duration.toDays() >= 1 -> "${duration.toDays()}d"
+        duration.toHours() >= 1 -> "${duration.toHours()}h"
+        duration.toMinutes() >= 1 -> "${duration.toMinutes()}m"
+        else -> "Just now"
+    }
+}
+
+fun formatNumber(number: Int): String {
+    return when {
+        number < 1_000 -> "$number"
+        number < 1_000_000 -> {
+            val result = number / 1_000.0
+            String.format("%.1fK", kotlin.math.floor(result * 10) / 10)
+        }
+        number < 1_000_000_000 -> {
+            val result = number / 1_000_000.0
+            String.format("%.1fM", kotlin.math.floor(result * 10) / 10)
+        }
+        else -> {
+            val result = number / 1_000_000_000.0
+            String.format("%.1fbl", kotlin.math.floor(result * 10) / 10)
         }
     }
 }

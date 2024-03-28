@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -162,7 +163,8 @@ fun SearchBar(query: TextFieldValue, onQueryChanged: (TextFieldValue) -> Unit, o
 
 @Composable
 fun UserList(navController: NavController, users: List<UserDto>, loginViewModel: LoginViewModel) {
-    LazyColumn(modifier = Modifier.padding(bottom = 56.dp)) {
+    val listState = rememberLazyListState()
+    LazyColumn(modifier = Modifier.padding(bottom = 56.dp), state = listState) {
         items(users) { user ->
             UserItem(user = user) {
                 if (user.id != loginViewModel.getUserId()) {

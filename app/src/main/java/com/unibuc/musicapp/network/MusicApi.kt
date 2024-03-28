@@ -1,7 +1,11 @@
 package com.unibuc.musicapp.network
 
+import com.unibuc.musicapp.dto.AddCommentDto
+import com.unibuc.musicapp.dto.CommentDto
+import com.unibuc.musicapp.dto.FeedPostDto
 import com.unibuc.musicapp.dto.LoginDto
 import com.unibuc.musicapp.dto.PostDto
+import com.unibuc.musicapp.dto.ReactionDto
 import com.unibuc.musicapp.dto.TokenDto
 import com.unibuc.musicapp.dto.UserDto
 import okhttp3.MultipartBody
@@ -61,4 +65,25 @@ interface MusicApi {
                            @Part videoPart: MultipartBody.Part): Long
     @POST("/posts/upload")
     suspend fun uploadPost(@Header("Authorization") accessToken: String, @Body postDto: PostDto): Long
+    @GET("/posts")
+    suspend fun getFeedPosts(@Header("Authorization") accessToken: String): List<FeedPostDto>
+
+    @POST("/comments/{postId}")
+    suspend fun addComment(@Header("Authorization") accessToken: String, @Body comment: AddCommentDto, @Path("postId") postId: Long): CommentDto
+
+    @POST("/reactions/post/{postId}")
+    suspend fun addReactionToPost(@Header("Authorization") accessToken: String, @Body reaction: ReactionDto, @Path("postId") postId: Long): Long
+
+    @POST("/reactions/comment/{commentId}")
+    suspend fun addReactionToComment(@Header("Authorization") accessToken: String, @Body reaction: ReactionDto, @Path("commentId") commentId: Long): Long
+
+    @DELETE("/reactions/post/{postId}")
+    suspend fun removeReactionFromPost(@Header("Authorization") accessToken: String, @Path("postId") postId: Long)
+
+    @DELETE("/reactions/{reactionId}")
+    suspend fun removeReaction(@Header("Authorization") accessToken: String, @Path("reactionId") reactionId: Long)
+
+    @DELETE("/comments/{commentId}")
+    suspend fun removeComment(@Header("Authorization") accessToken: String, @Path("commentId") commentId: Long)
+
 }
