@@ -76,6 +76,7 @@ import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -130,7 +131,8 @@ fun FeedScreen(
         navController.navigate(MusicScreens.LoginScreen.name)
     } else {
         LaunchedEffect(Unit) {
-            viewModel.loadFeedData()
+            if(posts == null)
+                viewModel.loadFeedData()
         }
         Surface(modifier = Modifier.fillMaxSize()) {
             if (fetchedData && posts != null && posts!!.isEmpty()) {
@@ -150,16 +152,26 @@ fun PostsList(navController: NavController, viewModel: FeedViewModel, loginViewM
     val listState = rememberLazyListState()
     LazyColumn(modifier = Modifier.padding(bottom = 56.dp), state= listState) {
         items(posts) { post ->
-            PostItem(post = post, viewModel = viewModel, navController = navController, loginViewModel = loginViewModel) {
-                if (!post.seen) {
-                    viewModel.markPostAsSeen(post.id)
+            PostItem(
+                post = post,
+                navController = navController,
+                loginViewModel = loginViewModel,
+                likeAction = { viewModel.likeAction(it) },
+                likeCommentAction = { commParam, postParam -> viewModel.likeCommentAction(commParam, postParam) },
+                addCommentAction = { addCommentDto, id -> viewModel.addComment(addCommentDto, id) },
+                removeCommentAction = { commentDto, feedPostDto ->  viewModel.removeComment(commentDto, feedPostDto)},
+                removePostAction = {},
+                onSeen = {
+                    if (!post.seen) {
+                        viewModel.markPostAsSeen(post.id)
+                    }
                 }
-            }
-            PostItem(post = post, viewModel = viewModel, navController = navController, loginViewModel = loginViewModel) {
-                if (!post.seen) {
-                    viewModel.markPostAsSeen(post.id)
-                }
-            }
+            )
+//            PostItem(post = post, viewModel = viewModel, navController = navController, loginViewModel = loginViewModel) {
+//                if (!post.seen) {
+//                    viewModel.markPostAsSeen(post.id)
+//                }
+//            }
         }
     }
 }
@@ -168,20 +180,91 @@ fun PostsList(navController: NavController, viewModel: FeedViewModel, loginViewM
 @Composable
 fun PostItem(
     post: FeedPostDto,
-    viewModel: FeedViewModel,
     loginViewModel: LoginViewModel,
     navController: NavController,
+    likeAction: (FeedPostDto) -> Unit,
+    removePostAction: (FeedPostDto) -> Unit,
+    likeCommentAction: (CommentDto, FeedPostDto) -> Unit,
+    addCommentAction: (AddCommentDto, Long) -> Unit,
+    removeCommentAction: (CommentDto, FeedPostDto) -> Unit,
     onSeen: () -> Unit
 ) {
     val context = LocalContext.current
     LocalLifecycleOwner.current
+    var showDialog by remember { mutableStateOf(false) }
     var isDescriptionExpanded by remember { mutableStateOf(false) }
     var isExpandable by remember { mutableStateOf(false) }
     val initiallyOverflowing = remember { mutableStateOf(false) }
+    val interactionSource = remember { MutableInteractionSource() }
+    val coroutineScope = rememberCoroutineScope()
+
+    if (showDialog) {
+        Dialog(
+            onDismissRequest = { showDialog = false },
+            properties = DialogProperties(usePlatformDefaultWidth = true)
+        ) {
+            Column(
+                modifier = Modifier
+                    .width(230.dp)
+                    .background(Color.White, shape = RoundedCornerShape(8.dp))
+                    .padding(top = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(text = "Remove Post?", color = Color.DarkGray, fontWeight = FontWeight.Bold, fontSize = 16.sp, letterSpacing = 0.4.sp)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 2.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Button(
+                        onClick = {
+                            removePostAction(post)
+                            showDialog = false
+                        },
+                        colors = ButtonDefaults.buttonColors(Color.Transparent),
+                        contentPadding = PaddingValues(
+                            horizontal = 4.dp,
+                            vertical = 2.dp
+                        )
+                    ) {
+                        Text(text = "Remove", color = Color.Red, fontWeight = FontWeight.Bold)
+                    }
+                    Button(
+                        onClick = { showDialog = false },
+                        colors = ButtonDefaults.buttonColors(Color.Transparent),
+                        contentPadding = PaddingValues(
+                            horizontal = 4.dp,
+                            vertical = 2.dp
+                        )
+                    ) {
+                        Text(text = "Cancel", color = Color.Black, fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
+        }
+    }
+
     Card(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 8.dp, vertical = 8.dp),
+            .padding(horizontal = 8.dp, vertical = 8.dp)
+            .indication(interactionSource, LocalIndication.current)
+            .pointerInput(interactionSource) {
+                detectTapGestures(onLongPress = {
+                    if (post.userDto.id == loginViewModel.getUserId()) {
+                        coroutineScope.launch {
+                            val press = PressInteraction.Press(Offset.Zero)
+                            interactionSource.emit(press)
+                            showDialog = true
+                            interactionSource.emit(PressInteraction.Release(press))
+                        }
+                    }
+                })
+            }
+            ,
         elevation = 4.dp,
         shape = MaterialTheme.shapes.medium
     ) {
@@ -227,9 +310,11 @@ fun PostItem(
                         fontWeight = FontWeight.Bold
                     )
                 }
-                Column(modifier = Modifier.clickable { isDescriptionExpanded = !isDescriptionExpanded }) {
+                Column(modifier = Modifier
+                    .clickable { if(isExpandable) isDescriptionExpanded = !isDescriptionExpanded }
+                    .padding(vertical = if (!isExpandable) 15.dp else 0.dp)) {
                     Text(
-                        text = "This text is very long. The reason this text was made so long is to be sure that we are able to test the functionality in cause.",
+                        text = post.description,
                         maxLines = if (isDescriptionExpanded) Int.MAX_VALUE else 2,
                         overflow = TextOverflow.Ellipsis,
                         fontSize = 13.sp,
@@ -267,9 +352,17 @@ fun PostItem(
                         .weight(1f)
                         .padding(end = 8.dp),
                 ) {
-                    viewModel.likeAction(post)
+                    likeAction(post)
                 }
-                CommentsButton(post, modifier = Modifier.weight(1f), viewModel = viewModel, navController = navController, loginViewModel = loginViewModel)
+                CommentsButton(
+                    post,
+                    modifier = Modifier.weight(1f),
+                    likeCommentAction = likeCommentAction,
+                    addCommentAction = addCommentAction,
+                    navController = navController,
+                    removeCommentAction = removeCommentAction,
+                    loginViewModel = loginViewModel
+                )
             }
         }
     }
@@ -300,7 +393,9 @@ fun LikeButton(post: FeedPostDto, modifier: Modifier, likeAction: () -> Unit) {
 fun CommentsButton(
     post: FeedPostDto,
     modifier: Modifier,
-    viewModel: FeedViewModel,
+    likeCommentAction: (CommentDto, FeedPostDto) -> Unit,
+    addCommentAction: (AddCommentDto, Long) -> Unit,
+    removeCommentAction: (CommentDto, FeedPostDto) -> Unit,
     navController: NavController,
     loginViewModel: LoginViewModel
 ) {
@@ -308,7 +403,6 @@ fun CommentsButton(
     val (commentText, setCommentText) = remember { mutableStateOf("") }
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
-    val lazyColumnMaxHeight = screenHeight * 0.7f
 
     Button(
         onClick = { showDialog = true },
@@ -332,10 +426,11 @@ fun CommentsButton(
         }
     }
     if (showDialog) {
-        val keyboardController = LocalSoftwareKeyboardController.current
         Dialog(
             onDismissRequest = { showDialog = false },
             properties = DialogProperties(usePlatformDefaultWidth = true)) {
+            val keyboardController = LocalSoftwareKeyboardController.current
+            val focusManager = LocalFocusManager.current
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -362,14 +457,14 @@ fun CommentsButton(
                             comment = comment,
                             userProfilePicture = post.userDto.profilePictureUrl,
                             currentUserId = loginViewModel.getUserId(),
-                            viewModel = viewModel,
+                            removeCommentAction = removeCommentAction,
                             post = post,
                             navigateToUserProfile = {
                                 showDialog = false
                                 navController.navigate(MusicScreens.ProfileScreen.routeWithParameters(comment.userId.toString()))
                             }
                         ) {
-                            viewModel.likeCommentAction(comment, post)
+                            likeCommentAction(comment, post)
                         }
                     }
                 }
@@ -384,9 +479,10 @@ fun CommentsButton(
                     colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background),
                     keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Send),
                     keyboardActions = KeyboardActions(onSend = {
-                        viewModel.addComment(AddCommentDto(content = commentText), post.id)
+                        addCommentAction(AddCommentDto(content = commentText), post.id)
                         setCommentText("")
                         keyboardController?.hide()
+                        focusManager.clearFocus()
                     })
                 )
             }
@@ -400,7 +496,7 @@ fun CommentItem(
     comment: CommentDto,
     userProfilePicture: String,
     currentUserId: Long,
-    viewModel: FeedViewModel,
+    removeCommentAction: (CommentDto, FeedPostDto) -> Unit,
     post: FeedPostDto,
     navigateToUserProfile: () -> Unit,
     likeAction: () -> Unit
@@ -433,7 +529,7 @@ fun CommentItem(
                 ) {
                     Button(
                         onClick = {
-                            viewModel.removeComment(comment, post)
+                            removeCommentAction(comment, post)
                             showDialog = false
                         },
                         colors = ButtonDefaults.buttonColors(Color.Transparent),

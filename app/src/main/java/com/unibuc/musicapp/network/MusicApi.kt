@@ -10,6 +10,7 @@ import com.unibuc.musicapp.dto.TokenDto
 import com.unibuc.musicapp.dto.UserDto
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -85,5 +86,11 @@ interface MusicApi {
 
     @DELETE("/comments/{commentId}")
     suspend fun removeComment(@Header("Authorization") accessToken: String, @Path("commentId") commentId: Long)
+
+    @DELETE("/posts/{postId}")
+    suspend fun removePost(@Header("Authorization") accessToken: String, @Path("postId") postId: Long): Response<Void>
+
+    @GET("/posts/user/{id}")
+    suspend fun getUserPosts(@Header("Authorization") accessToken: String, @Path("id") id: Long): List<FeedPostDto>
 
 }

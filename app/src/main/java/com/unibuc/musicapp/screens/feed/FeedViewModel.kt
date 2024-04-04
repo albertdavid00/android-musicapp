@@ -119,7 +119,7 @@ class FeedViewModel @Inject constructor(
 
                 val updatedFeedData = _feedData.value!!.map { post ->
                     if (post.id == postId) {
-                        val newCommentsList = post.comments + response
+                        val newCommentsList = listOf(response) + post.comments
                         post.copy(comments = newCommentsList)
                     } else {
                         post
@@ -239,7 +239,7 @@ class FeedViewModel @Inject constructor(
             try {
                 if (comment.userId == authRepository.getUserId()) {
                     api.removeComment(authRepository.getToken()!!, comment.id)
-                    Log.d("Feed", "Removed comment ${comment!!.id} from post.")
+                    Log.d("Feed", "Removed comment ${comment.id} from post.")
                     val newCommentsList = feedPost.comments.filterNot {
                         it.id == comment.id
                     }

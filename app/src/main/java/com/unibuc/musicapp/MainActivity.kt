@@ -1,9 +1,11 @@
 package com.unibuc.musicapp
 
 import android.annotation.SuppressLint
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,8 +21,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.GroupAdd
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
@@ -64,6 +68,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun MusicApp(loginViewModel: LoginViewModel = hiltViewModel()) {
@@ -131,6 +136,25 @@ fun MusicApp(loginViewModel: LoginViewModel = hiltViewModel()) {
                     )
 
                     BottomNavigationItem(
+                        icon = { Icon(Icons.Filled.MusicNote,
+                            contentDescription = "Matching",
+                            tint = if (currentRoute == MusicScreens.MatchingScreen.name)
+                                MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface) },
+                        selected = currentRoute == MusicScreens.MatchingScreen.name,
+                        onClick = { navController.navigate( MusicScreens.MatchingScreen.name) }
+                    )
+
+                    BottomNavigationItem(
+                        icon = { Icon(Icons.Filled.AddCircle,
+                            contentDescription = "Upload",
+                            tint = if (currentRoute == MusicScreens.CreatePostScreen.name)
+                                MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+                        )},
+                        selected = currentRoute == MusicScreens.CreatePostScreen.name,
+                        onClick = { navController.navigate(MusicScreens.CreatePostScreen.name) }
+                    )
+
+                    BottomNavigationItem(
                         icon = { Icon(Icons.Filled.Search,
                             contentDescription = "Search",
                             tint = if (currentRoute == MusicScreens.UsersScreen.name)
@@ -141,25 +165,14 @@ fun MusicApp(loginViewModel: LoginViewModel = hiltViewModel()) {
                     )
 
                     BottomNavigationItem(
-                        icon = { Icon(Icons.Filled.AddCircle,
-                            contentDescription = "Search",
-                            tint = if (currentRoute == MusicScreens.CreatePostScreen.name)
-                                MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
-                        )},
-                        selected = currentRoute == MusicScreens.CreatePostScreen.name,
-                        onClick = { navController.navigate(MusicScreens.CreatePostScreen.name) }
-                    )
-
-
-                    BottomNavigationItem(
                         icon = { Icon(Icons.Filled.Person,
                             contentDescription = "Profile",
                             tint = if (currentRoute == MusicScreens.ProfileScreen.name)
                                 MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface) },
                         selected = currentRoute == MusicScreens.ProfileScreen.name,
-                        onClick = { navController.navigate( MusicScreens.ProfileScreen
-                            .name) }
+                        onClick = { navController.navigate( MusicScreens.ProfileScreen.name) }
                     )
+
                     // Add more BottomNavigationItem as needed
                 }
             }

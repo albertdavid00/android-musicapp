@@ -1,5 +1,7 @@
 package com.unibuc.musicapp.screens.profile
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -17,6 +19,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
@@ -25,6 +30,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -50,21 +56,28 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.unibuc.musicapp.components.ImageDialog
+import com.unibuc.musicapp.dto.UserDto
 import com.unibuc.musicapp.navigation.MusicScreens
+import com.unibuc.musicapp.screens.feed.FeedViewModel
+import com.unibuc.musicapp.screens.feed.PostItem
+import com.unibuc.musicapp.screens.feed.PostsList
 import com.unibuc.musicapp.screens.login.LoginViewModel
 import com.unibuc.musicapp.utils.FollowParam
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ProfileScreen(navController: NavController,
                   userId: Long? = null,
                   viewModel: ProfileViewModel = hiltViewModel(),
                   loginViewModel: LoginViewModel = hiltViewModel()) {
     val userProfile by viewModel.userInfo.observeAsState()
+    val userPosts by viewModel.userPosts.observeAsState()
     if (!loginViewModel.isLoggedIn()) {
         navController.navigate(MusicScreens.LoginScreen.name)
     } else {
         LaunchedEffect(userId) {
                 viewModel.loadUserInfo(userId)
+                viewModel.loadUserPosts(userId)
         }
         if (userProfile == null) {
             Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
@@ -73,117 +86,33 @@ fun ProfileScreen(navController: NavController,
         } else {
             var showEnlargedProfilePicture by remember { mutableStateOf(false) }
             Surface(modifier = Modifier.fillMaxSize()) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Top){
-                    Row (horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-                        Image(
-                            painter = rememberAsyncImagePainter(userProfile!!.profilePictureUrl),
-                            contentDescription = "Profile Picture",
-                            modifier = Modifier
-                                .padding(top = 30.dp, end = 15.dp)
-                                .size(100.dp)
-                                .clip(CircleShape)
-                                .clickable { showEnlargedProfilePicture = true },
-                            contentScale = ContentScale.Crop // Adjust scaling to fit or fill as needed
+                val listState = rememberLazyListState()
+                LazyColumn(modifier = Modifier.padding(bottom = 56.dp), state= listState) {
+                    item {
+                        UserInfo(
+                            userId = userId,
+                            viewModel = viewModel,
+                            userProfile = userProfile,
+                            navController = navController,
+                            loginViewModel = loginViewModel,
+                            showEnlargedProfilePicture = showEnlargedProfilePicture,
+                            setShowEnlargedProfilePicture = { showEnlargedProfilePicture = it}
                         )
-                        if (showEnlargedProfilePicture) {
-                            ImageDialog(userProfile!!.profilePictureUrl) { showEnlargedProfilePicture = false }
-                        }
-                        Column {
-                            Text(
-                                text = userProfile!!.firstName + " " + userProfile!!.lastName,
-                                modifier = Modifier
-                                    .padding(top = 5.dp),
-                                style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.Bold)
-                            )
-                            Text(
-                                text = userProfile!!.age.toString() + " yo",
-                                color = Color.Gray,
-                                style = TextStyle(fontSize = 14.sp, fontStyle = FontStyle.Italic)
-                            )
-                        }
                     }
-                    Column ( 
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 10.dp, bottom = 10.dp, start = 32.dp, end = 32.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center) {
+                    userPosts?.let {
+                        items(userPosts!!) { post ->
+                            PostItem(
+                                post = post,
+                                onSeen = {},
+                                navController = navController,
+                                loginViewModel = loginViewModel,
+                                likeAction = { viewModel.likeAction(it) },
+                                addCommentAction = { addCommentDto, id -> viewModel.addComment(addCommentDto, id) },
+                                likeCommentAction = { commentDto, feedPostDto -> viewModel.likeCommentAction(commentDto, feedPostDto)},
+                                removeCommentAction = { commentDto, feedPostDto -> viewModel.removeComment(commentDto, feedPostDto)},
+                                removePostAction = { viewModel.removePost(it)}
 
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center,
-
-                                ) {
-                                Text(text = "Posts", fontSize = 14.sp)
-                                Button(
-                                    onClick = {  },
-                                    modifier = Modifier.height(32.dp),
-                                    colors = ButtonDefaults.buttonColors(Color.Transparent),
-                                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)) {
-                                    Text(text = userProfile!!.posts.toString(),
-                                        color = Color.Black,
-                                        style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold))
-                                }
-                            }
-
-                            // Spacer with a weight modifier to take up available space
-                            Spacer(Modifier.weight(1f))
-
-                            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center){
-                                Text(text = "Following", fontSize = 14.sp)
-                                Button(
-                                    onClick = {
-                                        if (userId != null) {
-                                            navController.navigate(MusicScreens.UsersScreen.routeWithParameters(FollowParam.FOLLOWING.name, userId.toString()))
-                                        } else {
-                                            navController.navigate(MusicScreens.UsersScreen.routeWithParameters(FollowParam.FOLLOWING.name, loginViewModel.getUserId().toString()))
-                                        }},
-                                    modifier = Modifier.height(32.dp),
-                                    colors = ButtonDefaults.buttonColors(Color.Transparent),
-                                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)) {
-                                    Text(
-                                        text = userProfile!!.following.toString(),
-                                        color = Color.Black,
-                                        style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                                    )
-                                }
-                            }
-
-                            Spacer(Modifier.weight(1f))
-
-                            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                                Text(text = "Followers", fontSize = 14.sp)
-                                Button(
-                                    onClick = {
-                                        if (userId != null) {
-                                            navController.navigate(MusicScreens.UsersScreen.routeWithParameters(FollowParam.FOLLOWERS.name, userId.toString()))
-                                        } else {
-                                            navController.navigate(MusicScreens.UsersScreen.routeWithParameters(FollowParam.FOLLOWERS.name, loginViewModel.getUserId().toString()))
-                                        }},
-                                    modifier = Modifier.height(32.dp),
-                                    colors = ButtonDefaults.buttonColors(Color.Transparent),
-                                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
-                                ) {
-                                    Text(
-                                        text = userProfile!!.followers.toString(),
-                                        color = Color.Black,
-                                        style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                                    )
-                                }
-                            }
-
-                        }
-                        
-                        if (userId != null && loginViewModel.getUserId() != userId) {
-                            Row {
-                                FollowButton (isFollowing = userProfile!!.isFollowedByCurrentUser) {
-                                    viewModel.followUnfollowAction(userId)
-                                }
-                            }
+                            )
                         }
                     }
                 }
@@ -191,6 +120,135 @@ fun ProfileScreen(navController: NavController,
         }
     }
 }
+
+@Composable
+fun UserInfo(
+    userId: Long?,
+    userProfile: UserDto?,
+    viewModel: ProfileViewModel,
+    navController: NavController,
+    loginViewModel: LoginViewModel,
+    showEnlargedProfilePicture: Boolean,
+    setShowEnlargedProfilePicture: (Boolean) -> Unit,
+) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Top){
+        Row (horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+            Image(
+                painter = rememberAsyncImagePainter(userProfile!!.profilePictureUrl),
+                contentDescription = "Profile Picture",
+                modifier = Modifier
+                    .padding(top = 30.dp, end = 15.dp)
+                    .size(100.dp)
+                    .clip(CircleShape)
+                    .clickable { setShowEnlargedProfilePicture(true) },
+                contentScale = ContentScale.Crop // Adjust scaling to fit or fill as needed
+            )
+            if (showEnlargedProfilePicture) {
+                ImageDialog(userProfile!!.profilePictureUrl) {setShowEnlargedProfilePicture(false)  }
+            }
+            Column {
+                Text(
+                    text = userProfile!!.firstName + " " + userProfile!!.lastName,
+                    modifier = Modifier
+                        .padding(top = 5.dp),
+                    style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                )
+                Text(
+                    text = userProfile!!.age.toString() + " yo",
+                    color = Color.Gray,
+                    style = TextStyle(fontSize = 14.sp, fontStyle = FontStyle.Italic)
+                )
+            }
+        }
+        Column (
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 10.dp, bottom = 10.dp, start = 32.dp, end = 32.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center) {
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+
+                    ) {
+                    Text(text = "Posts", fontSize = 14.sp)
+                    Button(
+                        onClick = {  },
+                        modifier = Modifier.height(32.dp),
+                        colors = ButtonDefaults.buttonColors(Color.Transparent),
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)) {
+                        Text(text = userProfile!!.posts.toString(),
+                            color = Color.Black,
+                            style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold))
+                    }
+                }
+
+                // Spacer with a weight modifier to take up available space
+                Spacer(Modifier.weight(1f))
+
+                Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center){
+                    Text(text = "Following", fontSize = 14.sp)
+                    Button(
+                        onClick = {
+                            if (userId != null) {
+                                navController.navigate(MusicScreens.UsersScreen.routeWithParameters(FollowParam.FOLLOWING.name, userId.toString()))
+                            } else {
+                                navController.navigate(MusicScreens.UsersScreen.routeWithParameters(FollowParam.FOLLOWING.name, loginViewModel.getUserId().toString()))
+                            }},
+                        modifier = Modifier.height(32.dp),
+                        colors = ButtonDefaults.buttonColors(Color.Transparent),
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)) {
+                        Text(
+                            text = userProfile!!.following.toString(),
+                            color = Color.Black,
+                            style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                        )
+                    }
+                }
+
+                Spacer(Modifier.weight(1f))
+
+                Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                    Text(text = "Followers", fontSize = 14.sp)
+                    Button(
+                        onClick = {
+                            if (userId != null) {
+                                navController.navigate(MusicScreens.UsersScreen.routeWithParameters(FollowParam.FOLLOWERS.name, userId.toString()))
+                            } else {
+                                navController.navigate(MusicScreens.UsersScreen.routeWithParameters(FollowParam.FOLLOWERS.name, loginViewModel.getUserId().toString()))
+                            }},
+                        modifier = Modifier.height(32.dp),
+                        colors = ButtonDefaults.buttonColors(Color.Transparent),
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
+                    ) {
+                        Text(
+                            text = userProfile!!.followers.toString(),
+                            color = Color.Black,
+                            style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                        )
+                    }
+                }
+
+            }
+
+            if (userId != null && loginViewModel.getUserId() != userId) {
+                Row {
+                    FollowButton (isFollowing = userProfile!!.isFollowedByCurrentUser) {
+                        viewModel.followUnfollowAction(userId)
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
 
 @Composable
 fun FollowButton(isFollowing: Boolean, onFollowToggle: () -> Unit) {

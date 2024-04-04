@@ -6,7 +6,8 @@ enum class MusicScreens {
     FeedScreen,
     ProfileScreen,
     CreatePostScreen,
-    UsersScreen;
+    UsersScreen,
+    MatchingScreen;
 
     fun routeWithParameters(param1: String? = null, param2: String? = null): String {
         return when (this) {
@@ -36,6 +37,7 @@ enum class MusicScreens {
             RegisterScreen.name -> RegisterScreen
             UsersScreen.name -> UsersScreen
             CreatePostScreen.name -> CreatePostScreen
+            MatchingScreen.name -> MatchingScreen
 
 
             null -> FeedScreen
