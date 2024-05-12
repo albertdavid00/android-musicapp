@@ -53,7 +53,7 @@ class ProfileViewModel @Inject constructor(private val api: MusicApi,
     fun loadUserPosts(userId: Long? = null) {
         viewModelScope.launch {
             try {
-                if (userId == null ) {
+                if (userId == null) {
                     val fetchedPosts = api.getUserPosts(authRepository.getToken()!!, authRepository.getUserId())
                     Log.d("User", fetchedPosts.toString())
                     _userPosts.postValue(fetchedPosts)

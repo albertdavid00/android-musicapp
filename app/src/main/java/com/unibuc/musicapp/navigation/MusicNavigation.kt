@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import com.unibuc.musicapp.screens.feed.FeedScreen
 import com.unibuc.musicapp.screens.login.LoginScreen
 import com.unibuc.musicapp.screens.match.MatchingScreen
+import com.unibuc.musicapp.screens.messages.MessagesScreen
 import com.unibuc.musicapp.screens.post.CreatePostScreen
 import com.unibuc.musicapp.screens.profile.ProfileScreen
 import com.unibuc.musicapp.screens.register.RegisterScreen
@@ -52,6 +53,9 @@ fun MusicNavigation(navController: NavHostController) {
         }
         composable(MusicScreens.MatchingScreen.name) {
             MatchingScreen(navController)
+        }
+        composable(MusicScreens.MessagesScreen.name) { 
+            MessagesScreen(navController = navController)
         }
     }
 }

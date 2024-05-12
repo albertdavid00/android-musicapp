@@ -100,6 +100,10 @@ dependencies {
 
     //FFMPEG
     implementation("com.arthenica:ffmpeg-kit-full-gpl:4.5.1-1")
+
+//    //permission
+//    implementation("com.google.accompanist:accompanist-permissions:0.34.0")
+
 }
 // Allow references to generated code
 kapt {

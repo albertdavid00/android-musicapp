@@ -5,9 +5,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
 import com.unibuc.musicapp.dto.RegisterDto
 import com.unibuc.musicapp.network.MusicApi
 import com.unibuc.musicapp.repository.AuthRepository
+import com.unibuc.musicapp.utils.Instrument
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -37,9 +39,10 @@ class RegisterScreenViewModel @Inject constructor(
                 val lastName = registerDto.lastName.toRequestBody("text/plain".toMediaTypeOrNull())
                 val firstName = registerDto.firstName.toRequestBody("text/plain".toMediaTypeOrNull())
                 val age = registerDto.age.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+                val instruments = registerDto.instruments.toJsonRequestBody()
                 val imagePart = registerDto.imagePart
                 Log.d("Register", imagePart.headers.toString())
-                api.register(email, password, lastName, firstName, age, imagePart)
+                api.register(email, password, lastName, firstName, age, imagePart, instruments)
                 toLogin()
             } catch (e: HttpException) {
                 Log.d("Register", e.response()?.errorBody()?.string()!!)
@@ -50,4 +53,9 @@ class RegisterScreenViewModel @Inject constructor(
             }
         }
     }
+    fun List<Instrument>.toJsonRequestBody(): RequestBody {
+        val json = Gson().toJson(this)
+        return json.toRequestBody("application/json".toMediaTypeOrNull())
+    }
+
 }

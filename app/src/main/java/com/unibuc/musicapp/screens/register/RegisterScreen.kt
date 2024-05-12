@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -30,17 +31,26 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Checkbox
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -69,10 +79,12 @@ import com.unibuc.musicapp.components.EmailInput
 import com.unibuc.musicapp.components.IntInputField
 import com.unibuc.musicapp.components.NameInput
 import com.unibuc.musicapp.components.PasswordInput
+import com.unibuc.musicapp.data.InstrumentOption
 import com.unibuc.musicapp.dto.RegisterDto
 import com.unibuc.musicapp.navigation.MusicScreens
 import com.unibuc.musicapp.screens.login.LoginViewModel
 import com.unibuc.musicapp.screens.login.SubmitButton
+import com.unibuc.musicapp.utils.Instrument
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -142,6 +154,13 @@ fun RegisterForm(
 
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     val context = LocalContext.current
+    val options = remember { mutableStateListOf(
+        InstrumentOption(Instrument.VOCALIST, false),
+        InstrumentOption(Instrument.ACOUSTIC_GUITAR, false),
+        InstrumentOption(Instrument.ELECTRIC_GUITAR, false),
+        InstrumentOption(Instrument.BASS, false),
+        InstrumentOption(Instrument.DRUMS, false)
+    ) }
 
     val ageRepresentation = when {
         // If the user hasn't interacted yet, and the number is 0, show empty
@@ -154,7 +173,8 @@ fun RegisterForm(
         (email.value.trim().isNotEmpty() && password.value.trim().isNotEmpty()
                 && lastName.value.trim().isNotEmpty() && firstName.value.trim().isNotEmpty()
                 && confirmPassword.value.trim() == password.value.trim()
-                && (age.intValue > 0) && (age.intValue < 120) && (imageUri != null))
+                && (age.intValue > 0) && (age.intValue < 120) && (imageUri != null)
+                && options.any { it.isSelected })
 
     }.value
     val modifier = Modifier
@@ -224,7 +244,7 @@ fun RegisterForm(
         )
     }
 
-    Column(modifier = Modifier.padding(top = 3.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+    Column(modifier = Modifier.padding(top = 3.dp).verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
         Button(onClick = {
             // Check and request permission
             when {
@@ -286,6 +306,8 @@ fun RegisterForm(
                 if (!valid) return@KeyboardActions
             })
 
+        MultiSelectDropdown(options)
+
         SubmitButton(
             textId = "Sign Up",
             loading = loading,
@@ -297,7 +319,9 @@ fun RegisterForm(
                 lastName.value.trim(),
                 firstName.value.trim(),
                 age.intValue,
-                prepareImageFilePart(context, imageUri!!, "profilePicture"))
+                prepareImageFilePart(context, imageUri!!, "profilePicture"),
+                options.filter { it.isSelected }.map { it.instrument }.toList()),
+
             )
             keyboardController?.hide()
         }
@@ -313,6 +337,59 @@ fun RegisterForm(
                 ),
                 modifier=Modifier.clickable { navController.navigate(MusicScreens.LoginScreen.name) }
             )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MultiSelectDropdown(options: MutableList<InstrumentOption>) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Column {
+        TextField(
+            value = options.filter { it.isSelected }.joinToString { it.instrument.toString() },
+            onValueChange = {},
+            label = { Text("Select Instruments") },
+            readOnly = true,
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.Filled.ArrowDropDown,
+                    contentDescription = "Dropdown Icon",
+                    Modifier.clickable { expanded = !expanded }
+                )
+            },
+            modifier = Modifier.padding(bottom = 10.dp, start = 10.dp, end = 10.dp)
+                .width(350.dp).clickable { expanded = !expanded }
+        )
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.padding(bottom = 10.dp, start = 10.dp, end = 10.dp)
+                .width(350.dp).padding(horizontal = 20.dp)
+        ) {
+            options.forEach { option ->
+                DropdownMenuItem(onClick = {
+                    option.isSelected = !option.isSelected
+                }) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                            }
+                    ) {
+                        Checkbox(
+                            checked = option.isSelected,
+                            onCheckedChange = { isSelected ->
+                                option.isSelected = isSelected
+                            }
+                        )
+                        Text(text = option.instrument.toString(), modifier = Modifier.padding(start = 8.dp))
+                    }
+                }
+            }
         }
     }
 }

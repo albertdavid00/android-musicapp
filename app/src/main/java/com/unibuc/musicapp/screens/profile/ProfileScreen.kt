@@ -84,10 +84,14 @@ fun ProfileScreen(navController: NavController,
                 CircularProgressIndicator()
             }
         } else {
+            var bottomBarPadding = 56.dp
+            if (userId != null) {
+                bottomBarPadding = 0.dp
+            }
             var showEnlargedProfilePicture by remember { mutableStateOf(false) }
             Surface(modifier = Modifier.fillMaxSize()) {
                 val listState = rememberLazyListState()
-                LazyColumn(modifier = Modifier.padding(bottom = 56.dp), state= listState) {
+                LazyColumn(modifier = Modifier.padding(bottom = bottomBarPadding), state= listState) {
                     item {
                         UserInfo(
                             userId = userId,
@@ -113,6 +117,12 @@ fun ProfileScreen(navController: NavController,
                                 removePostAction = { viewModel.removePost(it)}
 
                             )
+                        }
+                        if (userId != null) {
+                            item {
+                                Box(modifier = Modifier.height(12.dp)) {
+                                }
+                            }
                         }
                     }
                 }

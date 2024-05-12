@@ -104,6 +104,7 @@ import androidx.media3.ui.PlayerView
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.unibuc.musicapp.R
+import com.unibuc.musicapp.components.VisibilityIcon
 import com.unibuc.musicapp.components.formatNumber
 import com.unibuc.musicapp.components.timeFromNow
 import com.unibuc.musicapp.dto.AddCommentDto
@@ -302,16 +303,21 @@ fun PostItem(
                         Spacer(modifier = Modifier.width(5.dp))
                         Text(text = post.userDto.lastName + " " + post.userDto.firstName, fontWeight = FontWeight.Bold)
                     }
-                    Text(
-                        text = timeFromNow(post.creationTime),
-                        color = Color.Gray,
-                        fontSize = 12.sp,
-                        fontStyle = FontStyle.Italic,
-                        fontWeight = FontWeight.Bold
-                    )
+                    Column(verticalArrangement = Arrangement.SpaceBetween, horizontalAlignment = Alignment.CenterHorizontally) {
+                        // if(post.userDto.id != null && post.userDto.id == loginViewModel.getUserId()) // if we want only the user of the post to see the icon
+                        VisibilityIcon(visibilityType = post.visibility)
+
+                        Text(
+                            text = timeFromNow(post.creationTime),
+                            color = Color.Gray,
+                            fontSize = 12.sp,
+                            fontStyle = FontStyle.Italic,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
                 Column(modifier = Modifier
-                    .clickable { if(isExpandable) isDescriptionExpanded = !isDescriptionExpanded }
+                    .clickable { if (isExpandable) isDescriptionExpanded = !isDescriptionExpanded }
                     .padding(vertical = if (!isExpandable) 15.dp else 0.dp)) {
                     Text(
                         text = post.description,

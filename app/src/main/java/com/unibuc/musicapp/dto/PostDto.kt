@@ -6,5 +6,6 @@ import okhttp3.MultipartBody
 data class PostDto(
     val description: String,
     val visibility: Visibility,
-    val videoUrl: String
+    val videoUrl: String,
+    val id: Long = 0
 )

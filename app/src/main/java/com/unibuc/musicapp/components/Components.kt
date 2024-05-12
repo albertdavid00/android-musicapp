@@ -13,6 +13,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,6 +30,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.TextStyle
@@ -39,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import coil.compose.rememberAsyncImagePainter
+import com.unibuc.musicapp.utils.Visibility
 import java.time.Duration
 import java.time.Instant
 
@@ -230,4 +235,14 @@ fun formatNumber(number: Int): String {
             String.format("%.1fbl", kotlin.math.floor(result * 10) / 10)
         }
     }
+}
+
+@Composable
+fun VisibilityIcon(visibilityType: Visibility) {
+    val icon: ImageVector = when (visibilityType) {
+        Visibility.PUBLIC -> Icons.Filled.Public
+        Visibility.PRIVATE -> Icons.Filled.Lock
+        Visibility.FOLLOWERS -> Icons.Filled.People
+    }
+    Icon(icon, contentDescription = "Visibility Status")
 }

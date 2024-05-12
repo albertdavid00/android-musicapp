@@ -3,6 +3,7 @@ package com.unibuc.musicapp.network
 import com.unibuc.musicapp.dto.AddCommentDto
 import com.unibuc.musicapp.dto.CommentDto
 import com.unibuc.musicapp.dto.FeedPostDto
+import com.unibuc.musicapp.dto.LocationDto
 import com.unibuc.musicapp.dto.LoginDto
 import com.unibuc.musicapp.dto.PostDto
 import com.unibuc.musicapp.dto.ReactionDto
@@ -37,7 +38,8 @@ interface MusicApi {
                          @Part("lastName") lastName: RequestBody,
                          @Part("firstName") firstName: RequestBody,
                          @Part("age") age: RequestBody,
-                         @Part imagePart: MultipartBody.Part)
+                         @Part imagePart: MultipartBody.Part,
+                         @Part("instruments") instruments: RequestBody)
 
     @GET("/users/current")
     suspend fun getCurrentUser(@Header("Authorization") accessToken: String): UserDto
@@ -93,4 +95,17 @@ interface MusicApi {
     @GET("/posts/user/{id}")
     suspend fun getUserPosts(@Header("Authorization") accessToken: String, @Path("id") id: Long): List<FeedPostDto>
 
+    @POST("/users/location")
+    suspend fun saveUserLocation(@Header("Authorization") accessToken: String, @Body locationDto: LocationDto): Response<Long>
+
+    @GET("/users/recommended")
+    suspend fun getRecommendedUsers(@Header("Authorization") accessToken: String): List<UserDto>
+
+    @POST("/users/like/{userId}")
+    suspend fun likeUser(@Header("Authorization") accessToken: String, @Path("userId") id: Long): Response<Long>
+    @POST("/users/dislike/{userId}")
+    suspend fun dislikeUser(@Header("Authorization") accessToken: String, @Path("userId") id: Long): Response<Void>
+
+    @GET("/users/matches")
+    suspend fun getMatchedUsers(@Header("Authorization") accessToken: String): List<UserDto>
 }

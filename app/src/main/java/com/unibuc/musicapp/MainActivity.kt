@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.filled.Message
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
@@ -73,6 +74,7 @@ fun MusicApp(loginViewModel: LoginViewModel = hiltViewModel()) {
             val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
             val showBackButton = shouldShowBackButton(currentRoute)
             val showLogoutButton = shouldShowLogoutButton(currentRoute)
+            val showMessagesButton = shouldShowMessagesButton(currentRoute)
             if (currentRoute !in listOf(MusicScreens.LoginScreen.name, MusicScreens.RegisterScreen.name)) {
                 TopAppBar(
                     title = {
@@ -98,10 +100,16 @@ fun MusicApp(loginViewModel: LoginViewModel = hiltViewModel()) {
                                 contentAlignment = Alignment.CenterEnd
                             ) {
                                 // Invisible spacer for balance
-                                if (showBackButton) Spacer(modifier = Modifier.size(48.dp))
+                                if (showBackButton)
+                                    Spacer(modifier = Modifier.size(48.dp))
                                 if (showLogoutButton) {
                                     IconButton(onClick = { logoutAndRedirect(navController, loginViewModel) }) {
                                         Icon(imageVector = Icons.Default.Logout, contentDescription = "Logout", tint = MaterialTheme.colorScheme.onPrimary)
+                                    }
+                                }
+                                if (showMessagesButton) {
+                                    IconButton(onClick = { navController.navigate(MusicScreens.MessagesScreen.name) }) {
+                                        Icon(imageVector = Icons.Default.Message, contentDescription = "Messages", tint = MaterialTheme.colorScheme.onPrimary)
                                     }
                                 }
                             }
@@ -187,6 +195,12 @@ fun shouldShowBackButton(currentRoute: String?): Boolean {
 fun shouldShowLogoutButton(currentRoute: String?): Boolean {
     return currentRoute in listOf(
         MusicScreens.ProfileScreen.name
+    )
+}
+
+fun shouldShowMessagesButton(currentRoute: String?): Boolean {
+    return currentRoute in listOf(
+        MusicScreens.MatchingScreen.name
     )
 }
 
