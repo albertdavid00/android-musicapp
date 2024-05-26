@@ -56,7 +56,7 @@ fun MatchesList(navController: NavController, users: List<UserDto>, loginViewMod
         items(users) { user ->
             UserItem(user = user) {
                 // TODO navigate to conversation
-                // navController.navigate(MusicScreens.ProfileScreen.routeWithParameters(user.id.toString())) )
+                navController.navigate(MusicScreens.ChatScreen.routeWithParameters(user.id.toString()))
             }
         }
     }

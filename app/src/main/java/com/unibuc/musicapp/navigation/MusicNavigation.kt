@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.unibuc.musicapp.screens.chat.ChatScreen
 import com.unibuc.musicapp.screens.feed.FeedScreen
 import com.unibuc.musicapp.screens.login.LoginScreen
 import com.unibuc.musicapp.screens.match.MatchingScreen
@@ -56,6 +57,12 @@ fun MusicNavigation(navController: NavHostController) {
         }
         composable(MusicScreens.MessagesScreen.name) { 
             MessagesScreen(navController = navController)
+        }
+        composable(
+            route = MusicScreens.ChatScreen.routeWithParameters("{userId}")
+        ) { backStackEntry ->
+            val param = backStackEntry.arguments?.getString("userId")!!
+            ChatScreen(navController = navController, userId = param.toLong())
         }
     }
 }

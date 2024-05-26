@@ -7,6 +7,7 @@ import android.location.Geocoder
 import android.location.LocationManager
 import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -51,6 +52,7 @@ class MatchingViewModel  @Inject constructor(
 
     private val _matchedUserName = MutableStateFlow("")
     val matchedUserName = _matchedUserName.asStateFlow()
+    @RequiresApi(Build.VERSION_CODES.S)
     fun saveUserLocation(context: Context) {
         viewModelScope.launch {
             try {
@@ -70,10 +72,11 @@ class MatchingViewModel  @Inject constructor(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.S)
     @SuppressLint("ServiceCast", "MissingPermission")
     suspend fun getLocation(context: Context): LocationDto? = withContext(Dispatchers.IO) {
         val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        val location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER) ?: return@withContext null
+        val location = locationManager.getLastKnownLocation(LocationManager.FUSED_PROVIDER) ?: return@withContext null
 
         val geocoder = Geocoder(context, Locale.US)
         val address = geocoder.getAddress(location.latitude, location.longitude)

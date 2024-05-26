@@ -101,6 +101,11 @@ dependencies {
     //FFMPEG
     implementation("com.arthenica:ffmpeg-kit-full-gpl:4.5.1-1")
 
+    //sendbird
+    implementation("com.sendbird.sdk:sendbird-chat:4.16.3")
+
+    implementation ("com.google.android.gms:play-services-location:18.0.0")
+
 //    //permission
 //    implementation("com.google.accompanist:accompanist-permissions:0.34.0")
 

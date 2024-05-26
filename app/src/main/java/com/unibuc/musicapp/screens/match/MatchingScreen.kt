@@ -128,7 +128,9 @@ fun MatchingScreen(
             contract = ActivityResultContracts.RequestPermission(),
             onResult = { isGranted ->
                 hasLocationPermission = isGranted
+                Log.d("MatchingScreen", "Asking for permission")
                 if (isGranted) {
+                    Log.d("MatchingScreen", "Permission granted")
                     viewModel.saveUserLocation(context)
                 }
             }
@@ -141,7 +143,6 @@ fun MatchingScreen(
                 viewModel.getUserRecommendations()
             }
         }
-        val listState = rememberLazyListState()
         Surface(modifier = Modifier.fillMaxSize()) {
             if (hasLocationPermission) {
                 users?.let { userList ->

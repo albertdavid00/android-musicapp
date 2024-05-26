@@ -8,7 +8,8 @@ enum class MusicScreens {
     CreatePostScreen,
     UsersScreen,
     MatchingScreen,
-    MessagesScreen;
+    MessagesScreen,
+    ChatScreen;
 
     fun routeWithParameters(param1: String? = null, param2: String? = null): String {
         return when (this) {
@@ -25,7 +26,15 @@ enum class MusicScreens {
                     else -> name
                 }
             }
+            ChatScreen -> {
+                when {
+                    param1 != null -> "$name/$param1"
+                    else -> name
+                }
+            }
+
             else -> name
+
         }
     }
 
@@ -40,6 +49,7 @@ enum class MusicScreens {
             CreatePostScreen.name -> CreatePostScreen
             MatchingScreen.name -> MatchingScreen
             MessagesScreen.name -> MessagesScreen
+            ChatScreen.name -> ChatScreen
 
             null -> FeedScreen
             else -> throw IllegalArgumentException("Route $route is not recognised!")

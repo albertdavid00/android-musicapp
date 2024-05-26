@@ -124,7 +124,8 @@ fun MusicApp(loginViewModel: LoginViewModel = hiltViewModel()) {
             if (currentRoute !in listOf(
                     MusicScreens.LoginScreen.name,
                     MusicScreens.RegisterScreen.name,
-                    MusicScreens.ProfileScreen.routeWithParameters("{userId}")
+                    MusicScreens.ProfileScreen.routeWithParameters("{userId}"),
+                    MusicScreens.ChatScreen.routeWithParameters("{userId}")
                 )) {
                 BottomNavigation(backgroundColor = MaterialTheme.colorScheme.primary) {
 
@@ -188,7 +189,8 @@ fun MusicApp(loginViewModel: LoginViewModel = hiltViewModel()) {
 fun shouldShowBackButton(currentRoute: String?): Boolean {
     return currentRoute in listOf(
         MusicScreens.UsersScreen.routeWithParameters("{followParam}", "{userId}"),
-        MusicScreens.ProfileScreen.routeWithParameters("{userId}")
+        MusicScreens.ProfileScreen.routeWithParameters("{userId}"),
+        MusicScreens.ChatScreen.routeWithParameters("{userId}")
     )
 }
 
