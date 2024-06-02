@@ -39,10 +39,11 @@ class RegisterScreenViewModel @Inject constructor(
                 val lastName = registerDto.lastName.toRequestBody("text/plain".toMediaTypeOrNull())
                 val firstName = registerDto.firstName.toRequestBody("text/plain".toMediaTypeOrNull())
                 val age = registerDto.age.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+                val role = registerDto.selectedRole.name.toRequestBody("text/plain".toMediaTypeOrNull())
                 val instruments = registerDto.instruments.toJsonRequestBody()
                 val imagePart = registerDto.imagePart
                 Log.d("Register", imagePart.headers.toString())
-                api.register(email, password, lastName, firstName, age, imagePart, instruments)
+                api.register(email, password, lastName, firstName, role, age, imagePart, instruments)
                 toLogin()
             } catch (e: HttpException) {
                 Log.d("Register", e.response()?.errorBody()?.string()!!)

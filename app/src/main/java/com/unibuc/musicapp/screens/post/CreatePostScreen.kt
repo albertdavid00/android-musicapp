@@ -5,7 +5,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.os.Environment
-import android.util.Log
 import android.widget.VideoView
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -23,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.CircularProgressIndicator
@@ -36,7 +36,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -62,10 +65,9 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.unibuc.musicapp.dto.PostDto
 import com.unibuc.musicapp.navigation.MusicScreens
 import com.unibuc.musicapp.screens.login.LoginViewModel
-import com.unibuc.musicapp.utils.Constants
+import com.unibuc.musicapp.utils.Genre
 import com.unibuc.musicapp.utils.Visibility
 import kotlinx.coroutines.delay
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -87,6 +89,7 @@ fun CreatePostScreen(
 ) {
     var description by remember { mutableStateOf(TextFieldValue()) }
     var selectedVisibility by remember { mutableStateOf(Visibility.PUBLIC) }
+    var selectedGenre by remember {mutableStateOf(Genre.POP)}
     var videoUri by remember { mutableStateOf<Uri?>(null) }
     val context = LocalContext.current
     val valid = derivedStateOf{
@@ -109,16 +112,25 @@ fun CreatePostScreen(
                     .padding(horizontal = 16.dp, vertical = 10.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = "Create Post",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
-                        color = MaterialTheme.colors.onSurface,
-                        modifier = Modifier.padding(end = 8.dp),
-                        fontStyle = FontStyle.Italic
-                    )
+//                    Text(text = "Create Post",
+//                        fontWeight = FontWeight.Bold,
+//                        fontSize = 20.sp,
+//                        color = MaterialTheme.colors.onSurface,
+//                        modifier = Modifier.padding(end = 8.dp),
+//                        fontStyle = FontStyle.Italic
+//                    )
+                    GenreDropdownMenu(selectedGenre) {
+                        selectedGenre = it
+                    }
                     Button(
                         onClick = {
-                                  viewModel.uploadPostToAzureAndDB(prepareVideoFile(context, videoUri!!), description.text.trim(), selectedVisibility, context) {
+                                  viewModel.uploadPostToAzureAndDB(
+                                      prepareVideoFile(context, videoUri!!),
+                                      description.text.trim(),
+                                      selectedVisibility,
+                                      selectedGenre,
+                                      context
+                                  ) {
                                       navController.navigate(MusicScreens.FeedScreen.name)
                                   }
                         },
@@ -447,6 +459,57 @@ fun UploadingAnimation() {
                     fontSize = 18.sp
                 )
             )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun GenreDropdownMenu(selectedGenre: Genre, onSelectGenre: (Genre) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    val items = listOf(Genre.POP, Genre.ROCK, Genre.FOLK,
+        Genre.RAP, Genre.RB, Genre.COUNTRY, Genre.JAZZ,
+        Genre.CLASSIC, Genre.BLUES, Genre.HEAVY_METAL, Genre.OTHER)
+
+    Column (modifier = Modifier.width(200.dp)) {
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = {
+                expanded = !expanded
+            }
+        ) {
+            TextField(
+                readOnly = true,
+                value = selectedGenre.toString(),
+                onValueChange = {},
+                label = { Text(text = "Genre", fontWeight = FontWeight.Bold) },
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(
+                        expanded = expanded
+                    )
+                },
+                modifier = Modifier
+                    .menuAnchor() // Important for positioning the menu
+                    .fillMaxWidth()
+            )
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = {
+                    expanded = false
+                }
+            ) {
+                items.forEachIndexed { index, item ->
+                    val backgroundColor = if (index % 2 == 0) Color(0xFFECEBEB) else Color.White
+                    DropdownMenuItem(
+                        text = { Text(text = item.toString()) },
+                        onClick = {
+                            onSelectGenre(item)
+                            expanded = false
+                        },
+                        modifier = Modifier.background(backgroundColor)
+                    )
+                }
+            }
         }
     }
 }

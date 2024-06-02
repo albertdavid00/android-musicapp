@@ -1,6 +1,7 @@
 package com.unibuc.musicapp.dto
 
 import com.unibuc.musicapp.utils.Instrument
+import com.unibuc.musicapp.utils.Role
 
 data class UserDto(val id:Long,
                    val firstName: String,
@@ -12,5 +13,6 @@ data class UserDto(val id:Long,
                    val profilePictureUrl: String,
                    val instrumentsPlayed: List<Instrument>,
                    val isFollowedByCurrentUser: Boolean,
-                   val postsList: List<PostDto>,
-                   val location: LocationDto)
+                   val postsList: List<PostDto>?,
+                   val location: LocationDto,
+                   val role: Role)

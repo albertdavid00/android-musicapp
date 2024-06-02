@@ -39,6 +39,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProgressIndicatorDefaults
@@ -66,6 +68,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -84,7 +87,9 @@ import com.unibuc.musicapp.dto.RegisterDto
 import com.unibuc.musicapp.navigation.MusicScreens
 import com.unibuc.musicapp.screens.login.LoginViewModel
 import com.unibuc.musicapp.screens.login.SubmitButton
+import com.unibuc.musicapp.utils.Genre
 import com.unibuc.musicapp.utils.Instrument
+import com.unibuc.musicapp.utils.Role
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -151,6 +156,7 @@ fun RegisterForm(
     val firstNameFocusRequest = FocusRequester.Default
     val ageFocusRequest = FocusRequester.Default
     val userHasInteracted = remember { mutableStateOf(false) }
+    var selectedRole by remember { mutableStateOf(Role.USER) }
 
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     val context = LocalContext.current
@@ -231,20 +237,23 @@ fun RegisterForm(
     }
 
     // Optional: Display the selected image
-    imageUri?.let { uri ->
-        Image(
-            painter = rememberAsyncImagePainter(uri),
-            contentDescription = "Selected Image",
-            modifier = Modifier
-                .size(128.dp)
-                .clip(CircleShape),
-            contentScale = ContentScale.Crop
 
-            // Adjust size as needed
-        )
-    }
 
-    Column(modifier = Modifier.padding(top = 3.dp).verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+    Column(modifier = Modifier
+        .padding(top = 10.dp)
+        .verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+        imageUri?.let { uri ->
+            Image(
+                painter = rememberAsyncImagePainter(uri),
+                contentDescription = "Selected Image",
+                modifier = Modifier
+                    .size(128.dp)
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop
+
+                // Adjust size as needed
+            )
+        }
         Button(onClick = {
             // Check and request permission
             when {
@@ -267,25 +276,39 @@ fun RegisterForm(
             onAction = KeyboardActions {
                 lastNameFocusRequest.requestFocus()
             })
-        NameInput(
-            modifier = Modifier.focusRequester(lastNameFocusRequest),
-            valueState = lastName, enabled = !loading, labelId= "Last Name",
-            onAction = KeyboardActions {
-                firstNameFocusRequest.requestFocus()
-            })
-        NameInput(
-            modifier = Modifier.focusRequester(firstNameFocusRequest),
-            valueState = firstName, enabled = !loading, labelId= "First Name",
-            onAction = KeyboardActions {
-                ageFocusRequest.requestFocus()
-            })
-        IntInputField(
-            modifier = Modifier.focusRequester(firstNameFocusRequest),
-            valueState = age, textRepresentation = ageRepresentation,
-            userHasInteracted = userHasInteracted, enabled = !loading,
-            onAction = KeyboardActions {
-                passwordFocusRequest.requestFocus()
-            })
+        Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween){
+            NameInput(
+                modifier = Modifier
+                    .width(180.dp)
+                    .focusRequester(lastNameFocusRequest),
+                valueState = lastName, enabled = !loading, labelId= "Last Name",
+                onAction = KeyboardActions {
+                    firstNameFocusRequest.requestFocus()
+                })
+
+            NameInput(
+                modifier = Modifier
+                    .width(180.dp)
+                    .focusRequester(firstNameFocusRequest),
+                valueState = firstName, enabled = !loading, labelId= "First Name",
+                onAction = KeyboardActions {
+                    ageFocusRequest.requestFocus()
+                })
+        }
+        Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically) {
+
+            IntInputField(
+                modifier = Modifier
+                    .width(180.dp)
+                    .focusRequester(firstNameFocusRequest),
+                valueState = age, textRepresentation = ageRepresentation,
+                userHasInteracted = userHasInteracted, enabled = !loading,
+                onAction = KeyboardActions {
+                    passwordFocusRequest.requestFocus()
+                })
+            RoleDropdownMenu(selectedRole = selectedRole, onSelectRole = { selectedRole = it })
+        }
         PasswordInput(
             modifier = Modifier.focusRequester(passwordFocusRequest),
             passwordState=password,
@@ -318,6 +341,7 @@ fun RegisterForm(
                 password.value.trim(),
                 lastName.value.trim(),
                 firstName.value.trim(),
+                selectedRole,
                 age.intValue,
                 prepareImageFilePart(context, imageUri!!, "profilePicture"),
                 options.filter { it.isSelected }.map { it.instrument }.toList()),
@@ -359,15 +383,19 @@ fun MultiSelectDropdown(options: MutableList<InstrumentOption>) {
                     Modifier.clickable { expanded = !expanded }
                 )
             },
-            modifier = Modifier.padding(bottom = 10.dp, start = 10.dp, end = 10.dp)
-                .width(350.dp).clickable { expanded = !expanded }
+            modifier = Modifier
+                .padding(bottom = 10.dp, start = 10.dp, end = 10.dp)
+                .width(350.dp)
+                .clickable { expanded = !expanded }
         )
 
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier.padding(bottom = 10.dp, start = 10.dp, end = 10.dp)
-                .width(350.dp).padding(horizontal = 20.dp)
+            modifier = Modifier
+                .padding(bottom = 10.dp, start = 10.dp, end = 10.dp)
+                .width(350.dp)
+                .padding(horizontal = 20.dp)
         ) {
             options.forEach { option ->
                 DropdownMenuItem(onClick = {
@@ -388,6 +416,58 @@ fun MultiSelectDropdown(options: MutableList<InstrumentOption>) {
                         )
                         Text(text = option.instrument.toString(), modifier = Modifier.padding(start = 8.dp))
                     }
+                }
+            }
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun RoleDropdownMenu(selectedRole: Role, onSelectRole: (Role) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    val items = listOf(Role.USER, Role.MANAGER)
+
+    Column (modifier = Modifier
+        .width(180.dp)
+        .padding(end = 10.dp, bottom = 2.dp, start = 10.dp), verticalArrangement = Arrangement.Center) {
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = {
+                expanded = !expanded
+            }
+        ) {
+            androidx.compose.material.TextField(
+                readOnly = true,
+                value = selectedRole.toString(),
+                onValueChange = {},
+                label = { Text(text = "Genre", fontWeight = FontWeight.Bold) },
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(
+                        expanded = expanded
+                    )
+                },
+                modifier = Modifier
+                    .menuAnchor() // Important for positioning the menu
+                    .fillMaxWidth()
+            )
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = {
+                    expanded = false
+                }
+            ) {
+                items.forEachIndexed { index, item ->
+                    val backgroundColor = if (index % 2 == 0) Color(0xFFECEBEB) else Color.White
+                    androidx.compose.material3.DropdownMenuItem(
+                        text = { Text(text = item.toString()) },
+                        onClick = {
+                            onSelectRole(item)
+                            expanded = false
+                        },
+                        modifier = Modifier.background(backgroundColor)
+                    )
                 }
             }
         }

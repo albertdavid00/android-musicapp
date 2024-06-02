@@ -9,6 +9,7 @@ import com.unibuc.musicapp.dto.PostDto
 import com.unibuc.musicapp.dto.ReactionDto
 import com.unibuc.musicapp.dto.TokenDto
 import com.unibuc.musicapp.dto.UserDto
+import com.unibuc.musicapp.dto.UserProfileDto
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -37,15 +38,16 @@ interface MusicApi {
                          @Part("password") password: RequestBody,
                          @Part("lastName") lastName: RequestBody,
                          @Part("firstName") firstName: RequestBody,
+                         @Part("role") role: RequestBody,
                          @Part("age") age: RequestBody,
                          @Part imagePart: MultipartBody.Part,
                          @Part("instruments") instruments: RequestBody)
 
     @GET("/users/current")
-    suspend fun getCurrentUser(@Header("Authorization") accessToken: String): UserDto
+    suspend fun getCurrentUser(@Header("Authorization") accessToken: String): UserProfileDto
 
     @GET("/users/{userId}")
-    suspend fun getUser(@Header("Authorization") accessToken: String, @Path("userId") userId: Long): UserDto
+    suspend fun getUser(@Header("Authorization") accessToken: String, @Path("userId") userId: Long): UserProfileDto
     @GET("/users/followers/{userId}")
     suspend fun getUserFollowers(@Header("Authorization") accessToken: String, @Path("userId") userId: Long): List<UserDto>
 
@@ -108,4 +110,10 @@ interface MusicApi {
 
     @GET("/users/matches")
     suspend fun getMatchedUsers(@Header("Authorization") accessToken: String): List<UserDto>
+
+    @POST("/users/contact/{userId}")
+    suspend fun addContact(@Header("Authorization") accessToken: String, @Path("userId") userId: Long): Response<Void>
+
+    @GET("/users/contacts")
+    suspend fun getAllContacts(@Header("Authorization") accessToken: String): List<UserDto>
 }

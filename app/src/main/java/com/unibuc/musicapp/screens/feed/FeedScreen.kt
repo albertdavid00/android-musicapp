@@ -115,8 +115,6 @@ import com.unibuc.musicapp.dto.PostDto
 import com.unibuc.musicapp.dto.UserDto
 import com.unibuc.musicapp.navigation.MusicScreens
 import com.unibuc.musicapp.screens.login.LoginViewModel
-import com.unibuc.musicapp.screens.users.UserItem
-import com.unibuc.musicapp.utils.Visibility
 import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)

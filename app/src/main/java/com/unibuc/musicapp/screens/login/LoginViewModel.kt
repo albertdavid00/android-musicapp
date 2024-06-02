@@ -42,6 +42,12 @@ class LoginViewModel @Inject constructor(private val api: MusicApi,
     fun getUserId(): Long {
         return authRepository.getUserId()
     }
+    fun hasUserRole(): Boolean {
+        return authRepository.hasUserRole()
+    }
+    fun hasManagerRole(): Boolean {
+        return authRepository.hasManagerRole()
+    }
     fun login(email: String, password: String, home: () -> Unit) {
         viewModelScope.launch {
             try{

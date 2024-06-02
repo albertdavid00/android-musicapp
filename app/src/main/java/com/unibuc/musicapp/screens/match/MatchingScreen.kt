@@ -232,7 +232,7 @@ fun UserCard(user: UserDto, currentVideoIndex: MutableState<Int>, onMatchAction:
     LocalLifecycleOwner.current
     val interactionSource = remember { MutableInteractionSource() }
 
-    val maxIndex = user.postsList.size - 1
+    val maxIndex = user.postsList!!.size - 1
     val swipeableState = rememberSwipeableState(initialValue = currentVideoIndex.value)
     var showEnlargedProfilePicture by remember { mutableStateOf(false) }
     val configuration = LocalConfiguration.current
@@ -311,7 +311,7 @@ fun UserCard(user: UserDto, currentVideoIndex: MutableState<Int>, onMatchAction:
             LaunchedEffect(swipeableState.currentValue) {
                 currentVideoIndex.value = swipeableState.currentValue
             }
-            if (user.postsList.isNotEmpty()) {
+            if (user.postsList!!.isNotEmpty()) {
                 VideoIndicator(
                     totalVideos = user.postsList.size,
                     currentIndex = currentVideoIndex.value,

@@ -27,6 +27,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -57,12 +58,14 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.unibuc.musicapp.components.ImageDialog
 import com.unibuc.musicapp.dto.UserDto
+import com.unibuc.musicapp.dto.UserProfileDto
 import com.unibuc.musicapp.navigation.MusicScreens
 import com.unibuc.musicapp.screens.feed.FeedViewModel
 import com.unibuc.musicapp.screens.feed.PostItem
 import com.unibuc.musicapp.screens.feed.PostsList
 import com.unibuc.musicapp.screens.login.LoginViewModel
 import com.unibuc.musicapp.utils.FollowParam
+import com.unibuc.musicapp.utils.Role
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -134,7 +137,7 @@ fun ProfileScreen(navController: NavController,
 @Composable
 fun UserInfo(
     userId: Long?,
-    userProfile: UserDto?,
+    userProfile: UserProfileDto?,
     viewModel: ProfileViewModel,
     navController: NavController,
     loginViewModel: LoginViewModel,
@@ -158,7 +161,7 @@ fun UserInfo(
             }
             Column {
                 Text(
-                    text = userProfile!!.firstName + " " + userProfile!!.lastName,
+                    text = userProfile!!.lastName + " " + userProfile!!.firstName,
                     modifier = Modifier
                         .padding(top = 5.dp),
                     style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.Bold)
@@ -168,6 +171,21 @@ fun UserInfo(
                     color = Color.Gray,
                     style = TextStyle(fontSize = 14.sp, fontStyle = FontStyle.Italic)
                 )
+                if (Role.MANAGER == userProfile!!.role) {
+                    Row (horizontalArrangement = Arrangement.Center) {
+                        Text(text = userProfile!!.role.toString() + " ", color = Color.Gray,
+                            style = TextStyle(fontSize = 15.sp))
+                        Icon(
+                            imageVector = Icons.Default.Verified,
+                            contentDescription = "Verified",
+                            modifier = Modifier
+                                .size(16.dp)
+                                .align(Alignment.CenterVertically),
+                            tint = Color(0xFF2DB7E4)
+                        )
+                    }
+
+                }
             }
         }
         Column (
@@ -247,9 +265,26 @@ fun UserInfo(
             }
 
             if (userId != null && loginViewModel.getUserId() != userId) {
-                Row {
-                    FollowButton (isFollowing = userProfile!!.isFollowedByCurrentUser) {
-                        viewModel.followUnfollowAction(userId)
+                if (!loginViewModel.hasManagerRole()) {
+                    Row {
+                        FollowButton (isFollowing = userProfile!!.isFollowedByCurrentUser) {
+                            viewModel.followUnfollowAction(userId)
+                        }
+                    }
+                } else {
+                    Row(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
+                        FollowButton (isFollowing = userProfile!!.isFollowedByCurrentUser) {
+                            viewModel.followUnfollowAction(userId)
+                        }
+                        Button(onClick = {
+                            viewModel.addToContactList(userId)
+                            navController.navigate(MusicScreens.ChatScreen.routeWithParameters(userId.toString()))
+                        }, modifier = Modifier
+                            .size(width = 155.dp, height = 40.dp)) {
+                            Text(text = "Contact")
+                        }
                     }
                 }
             }

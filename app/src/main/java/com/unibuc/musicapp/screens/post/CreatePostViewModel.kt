@@ -27,6 +27,7 @@ import java.io.IOException
 import javax.inject.Inject
 import com.arthenica.ffmpegkit.FFmpegKit
 import com.arthenica.ffmpegkit.ReturnCode
+import com.unibuc.musicapp.utils.Genre
 
 @HiltViewModel
 class CreatePostViewModel @Inject constructor(
@@ -42,6 +43,7 @@ class CreatePostViewModel @Inject constructor(
         videoFile: File,
         description: String,
         selectedVisibility: Visibility,
+        selectedGenre: Genre,
         context: Context,
         redirectToFeed: () -> Unit
     ) {
@@ -49,7 +51,7 @@ class CreatePostViewModel @Inject constructor(
         val blobUrl = Constants.AZURE_BLOB_SAS_URL + videoUrl
         val sasUrl = blobUrl + Constants.AZURE_BLOB_SAS_TOKEN
         val cdnUrl = Constants.AZURE_CDN_PREFIX_URL + videoUrl
-        val postDto = PostDto(description, selectedVisibility, cdnUrl)
+        val postDto = PostDto(description, selectedVisibility, selectedGenre, cdnUrl)
         uploadFileToAzureAndDB(videoFile, postDto, sasUrl, context, redirectToFeed)
     }
     private fun uploadFileToAzureAndDB(file: File, postDto: PostDto, sasUrl: String, context: Context, redirectToFeed: () -> Unit) {

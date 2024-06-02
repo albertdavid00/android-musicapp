@@ -10,6 +10,7 @@ import com.unibuc.musicapp.dto.CommentDto
 import com.unibuc.musicapp.dto.FeedPostDto
 import com.unibuc.musicapp.dto.ReactionDto
 import com.unibuc.musicapp.dto.UserDto
+import com.unibuc.musicapp.dto.UserProfileDto
 import com.unibuc.musicapp.network.MusicApi
 import com.unibuc.musicapp.repository.AuthRepository
 import com.unibuc.musicapp.utils.ReactionType
@@ -22,8 +23,8 @@ import javax.inject.Inject
 class ProfileViewModel @Inject constructor(private val api: MusicApi,
                                            private val authRepository: AuthRepository): ViewModel() {
 
-    private val _userInfo = MutableLiveData<UserDto?>()
-    val userInfo: LiveData<UserDto?> = _userInfo
+    private val _userInfo = MutableLiveData<UserProfileDto?>()
+    val userInfo: LiveData<UserProfileDto?> = _userInfo
 
     private val _userPosts = MutableLiveData<List<FeedPostDto>>()
     val userPosts: LiveData<List<FeedPostDto>> = _userPosts
@@ -259,6 +260,18 @@ class ProfileViewModel @Inject constructor(private val api: MusicApi,
                 Log.d("Exc", e.code().toString() + " " + e.response()?.errorBody()?.string())
             } catch (e: Exception) {
                 Log.d("Exc", e.message.toString())
+            }
+        }
+    }
+
+    fun addToContactList(userId: Long) {
+        viewModelScope.launch {
+            try {
+                api.addContact(authRepository.getToken()!!, userId)
+            } catch (e: HttpException) {
+                Log.d("Exc", "Err: " + e.response()?.errorBody()?.string()!!)
+            } catch (e: Exception) { // Catching all exceptions
+                Log.d("Exc", "Err: " + e.message.toString())
             }
         }
     }

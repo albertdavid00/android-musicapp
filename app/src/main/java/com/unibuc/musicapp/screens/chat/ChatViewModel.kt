@@ -21,6 +21,7 @@ import com.sendbird.android.params.MessageCollectionCreateParams
 import com.sendbird.android.params.MessageListParams
 import com.sendbird.android.user.User
 import com.unibuc.musicapp.dto.UserDto
+import com.unibuc.musicapp.dto.UserProfileDto
 import com.unibuc.musicapp.network.MusicApi
 import com.unibuc.musicapp.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -53,8 +54,8 @@ class ChatViewModel @Inject constructor(
     private val _currentChannel = MutableStateFlow<GroupChannel?>(null)
     val currentChannel: StateFlow<GroupChannel?> = _currentChannel
 
-    private val _userInfo = MutableLiveData<UserDto?>()
-    val userInfo: LiveData<UserDto?> = _userInfo
+    private val _userInfo = MutableLiveData<UserProfileDto?>()
+    val userInfo: LiveData<UserProfileDto?> = _userInfo
 
     private lateinit var messageCollection: MessageCollection
 

@@ -93,6 +93,7 @@ dependencies {
     //JWT
     implementation ("com.auth0.android:jwtdecode:2.0.1")
     implementation ("androidx.compose.runtime:runtime-livedata")
+    implementation ("com.auth0:java-jwt:3.18.2")
 
     //ExoPlayer
     implementation("androidx.media3:media3-exoplayer:1.3.0")
@@ -108,6 +109,9 @@ dependencies {
 
 //    //permission
 //    implementation("com.google.accompanist:accompanist-permissions:0.34.0")
+    //jackson
+    implementation ("com.fasterxml.jackson.module:jackson-module-kotlin:2.17.0")
+
 
 }
 // Allow references to generated code

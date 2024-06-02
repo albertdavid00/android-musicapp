@@ -4,9 +4,14 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.auth0.android.jwt.Claim
 import com.auth0.android.jwt.JWT
+import com.auth0.jwt.interfaces.DecodedJWT
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.unibuc.musicapp.dto.TokenDto
 import com.unibuc.musicapp.utils.Constants.ACCESS_TOKEN
+import org.json.JSONObject
 import javax.inject.Inject
 
 class AuthRepository @Inject constructor(private val sharedPreferences: SharedPreferences) {
@@ -41,5 +46,17 @@ class AuthRepository @Inject constructor(private val sharedPreferences: SharedPr
     fun getUserId(): Long {
         val jwt = JWT(getToken()!!.replace("Bearer ", ""))
         return jwt.getClaim("preferred_username").asLong()!!
+    }
+
+    fun hasManagerRole(): Boolean {
+        val jwt: DecodedJWT = com.auth0.jwt.JWT.decode(getToken()!!.replace("Bearer ", ""))
+        val roles = jwt.getClaim("realm_access").asMap()["roles"] as List<String>
+        return roles.contains("MANAGER")
+    }
+
+    fun hasUserRole(): Boolean {
+        val jwt: DecodedJWT = com.auth0.jwt.JWT.decode(getToken()!!.replace("Bearer ", ""))
+        val roles = jwt.getClaim("realm_access").asMap()["roles"] as List<String>
+        return roles.contains("USER")
     }
 }

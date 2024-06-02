@@ -20,10 +20,12 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Contacts
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Message
 import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
@@ -75,6 +77,8 @@ fun MusicApp(loginViewModel: LoginViewModel = hiltViewModel()) {
             val showBackButton = shouldShowBackButton(currentRoute)
             val showLogoutButton = shouldShowLogoutButton(currentRoute)
             val showMessagesButton = shouldShowMessagesButton(currentRoute)
+            val showContactsButton = shouldShowContactsButton(currentRoute)
+            val title = getTitle(currentRoute)
             if (currentRoute !in listOf(MusicScreens.LoginScreen.name, MusicScreens.RegisterScreen.name)) {
                 TopAppBar(
                     title = {
@@ -94,7 +98,7 @@ fun MusicApp(loginViewModel: LoginViewModel = hiltViewModel()) {
                             Box(modifier = Modifier.weight(1f),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text(text = "MUSIC APP", color = Color.White, style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold))
+                                Text(text = title, color = Color.White, style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold))
                             }
                             Box(modifier = Modifier.weight(1f),
                                 contentAlignment = Alignment.CenterEnd
@@ -110,6 +114,11 @@ fun MusicApp(loginViewModel: LoginViewModel = hiltViewModel()) {
                                 if (showMessagesButton) {
                                     IconButton(onClick = { navController.navigate(MusicScreens.MessagesScreen.name) }) {
                                         Icon(imageVector = Icons.Default.Message, contentDescription = "Messages", tint = MaterialTheme.colorScheme.onPrimary)
+                                    }
+                                }
+                                if (showContactsButton) {
+                                    IconButton(onClick = { navController.navigate(MusicScreens.ContactsScreen.name) }) {
+                                        Icon(imageVector = Icons.Default.Contacts, contentDescription = "Contacts", tint = MaterialTheme.colorScheme.onPrimary)
                                     }
                                 }
                             }
@@ -186,6 +195,8 @@ fun MusicApp(loginViewModel: LoginViewModel = hiltViewModel()) {
     }
 }
 
+
+
 fun shouldShowBackButton(currentRoute: String?): Boolean {
     return currentRoute in listOf(
         MusicScreens.UsersScreen.routeWithParameters("{followParam}", "{userId}"),
@@ -206,6 +217,18 @@ fun shouldShowMessagesButton(currentRoute: String?): Boolean {
     )
 }
 
+fun shouldShowContactsButton(currentRoute: String?): Boolean {
+    return currentRoute in listOf(
+        MusicScreens.FeedScreen.name, MusicScreens.UsersScreen.name
+    )
+}
+
+fun getTitle(currentRoute: String?): String {
+    if (currentRoute in listOf(MusicScreens.CreatePostScreen.name)) {
+        return "Create Post"
+    }
+    return "MuSync"
+}
 //@Composable
 //fun MusicHome( viewModel: UsersViewModel = hiltViewModel()) {
 //    Users(viewModel)
