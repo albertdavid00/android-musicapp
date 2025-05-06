@@ -29,7 +29,7 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -91,7 +91,7 @@ fun MusicApp(loginViewModel: LoginViewModel = hiltViewModel()) {
                             ) {
                                 if (showBackButton) {
                                     IconButton(onClick = { navController.navigateUp() }) {
-                                        Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back", tint = MaterialTheme.colorScheme.onPrimary)
+                                        Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back", tint = MaterialTheme.colors.onPrimary)
                                     }
                                 }
                             }
@@ -108,23 +108,23 @@ fun MusicApp(loginViewModel: LoginViewModel = hiltViewModel()) {
                                     Spacer(modifier = Modifier.size(48.dp))
                                 if (showLogoutButton) {
                                     IconButton(onClick = { logoutAndRedirect(navController, loginViewModel) }) {
-                                        Icon(imageVector = Icons.Default.Logout, contentDescription = "Logout", tint = MaterialTheme.colorScheme.onPrimary)
+                                        Icon(imageVector = Icons.Default.Logout, contentDescription = "Logout", tint = MaterialTheme.colors.onPrimary)
                                     }
                                 }
                                 if (showMessagesButton) {
                                     IconButton(onClick = { navController.navigate(MusicScreens.MessagesScreen.name) }) {
-                                        Icon(imageVector = Icons.Default.Message, contentDescription = "Messages", tint = MaterialTheme.colorScheme.onPrimary)
+                                        Icon(imageVector = Icons.Default.Message, contentDescription = "Messages", tint = MaterialTheme.colors.onPrimary)
                                     }
                                 }
                                 if (showContactsButton) {
                                     IconButton(onClick = { navController.navigate(MusicScreens.ContactsScreen.name) }) {
-                                        Icon(imageVector = Icons.Default.Contacts, contentDescription = "Contacts", tint = MaterialTheme.colorScheme.onPrimary)
+                                        Icon(imageVector = Icons.Default.Contacts, contentDescription = "Contacts", tint = MaterialTheme.colors.onPrimary)
                                     }
                                 }
                             }
                         }
                     },
-                    backgroundColor = MaterialTheme.colorScheme.primary,
+                    backgroundColor = MaterialTheme.colors.primary,
                 )
             }
         },
@@ -136,13 +136,13 @@ fun MusicApp(loginViewModel: LoginViewModel = hiltViewModel()) {
                     MusicScreens.ProfileScreen.routeWithParameters("{userId}"),
                     MusicScreens.ChatScreen.routeWithParameters("{userId}")
                 )) {
-                BottomNavigation(backgroundColor = MaterialTheme.colorScheme.primary) {
+                BottomNavigation(backgroundColor = MaterialTheme.colors.primary) {
 
                     BottomNavigationItem(
                         icon = { Icon(Icons.Filled.Home,
                             contentDescription = "Feed",
                             tint = if (currentRoute == MusicScreens.FeedScreen.name)
-                                MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+                                MaterialTheme.colors.onPrimary else MaterialTheme.colors.onSurface
                         )},
                         selected = currentRoute == MusicScreens.FeedScreen.name,
                         onClick = { navController.navigate(MusicScreens.FeedScreen.name) }
@@ -152,7 +152,7 @@ fun MusicApp(loginViewModel: LoginViewModel = hiltViewModel()) {
                         icon = { Icon(Icons.Filled.MusicNote,
                             contentDescription = "Matching",
                             tint = if (currentRoute == MusicScreens.MatchingScreen.name)
-                                MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface) },
+                                MaterialTheme.colors.onPrimary else MaterialTheme.colors.onSurface) },
                         selected = currentRoute == MusicScreens.MatchingScreen.name,
                         onClick = { navController.navigate( MusicScreens.MatchingScreen.name) }
                     )
@@ -161,7 +161,7 @@ fun MusicApp(loginViewModel: LoginViewModel = hiltViewModel()) {
                         icon = { Icon(Icons.Filled.AddCircle,
                             contentDescription = "Upload",
                             tint = if (currentRoute == MusicScreens.CreatePostScreen.name)
-                                MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+                                MaterialTheme.colors.onPrimary else MaterialTheme.colors.onSurface
                         )},
                         selected = currentRoute == MusicScreens.CreatePostScreen.name,
                         onClick = { navController.navigate(MusicScreens.CreatePostScreen.name) }
@@ -171,7 +171,7 @@ fun MusicApp(loginViewModel: LoginViewModel = hiltViewModel()) {
                         icon = { Icon(Icons.Filled.Search,
                             contentDescription = "Search",
                             tint = if (currentRoute == MusicScreens.UsersScreen.name)
-                                MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+                                MaterialTheme.colors.onPrimary else MaterialTheme.colors.onSurface
                         )},
                         selected = currentRoute == MusicScreens.UsersScreen.name,
                         onClick = { navController.navigate(MusicScreens.UsersScreen.name) }
@@ -181,7 +181,7 @@ fun MusicApp(loginViewModel: LoginViewModel = hiltViewModel()) {
                         icon = { Icon(Icons.Filled.Person,
                             contentDescription = "Profile",
                             tint = if (currentRoute == MusicScreens.ProfileScreen.name)
-                                MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface) },
+                                MaterialTheme.colors.onPrimary else MaterialTheme.colors.onSurface) },
                         selected = currentRoute == MusicScreens.ProfileScreen.name,
                         onClick = { navController.navigate( MusicScreens.ProfileScreen.name) }
                     )

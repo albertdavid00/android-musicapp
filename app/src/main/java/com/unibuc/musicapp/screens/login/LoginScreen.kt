@@ -23,7 +23,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Surface
@@ -167,7 +167,8 @@ fun SubmitButton(textId: String, loading: Boolean, validInputs: Boolean, onClick
             .padding(3.dp)
             .fillMaxWidth(),
         enabled = !loading && validInputs,
-        shape = CircleShape) {
+        shape = CircleShape,
+        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE))) {
         if (loading) CircularProgressIndicator(modifier = Modifier.size(25.dp))
         else Text(text= textId, modifier = Modifier.padding(5.dp))
 

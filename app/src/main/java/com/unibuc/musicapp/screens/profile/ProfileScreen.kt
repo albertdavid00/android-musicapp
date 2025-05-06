@@ -161,7 +161,7 @@ fun UserInfo(
             }
             Column {
                 Text(
-                    text = userProfile!!.lastName + " " + userProfile!!.firstName,
+                    text = userProfile!!.firstName + " " + userProfile!!.lastName,
                     modifier = Modifier
                         .padding(top = 5.dp),
                     style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.Bold)
@@ -171,6 +171,13 @@ fun UserInfo(
                     color = Color.Gray,
                     style = TextStyle(fontSize = 14.sp, fontStyle = FontStyle.Italic)
                 )
+                if(Role.USER == userProfile!!.role) {
+                    Text(
+                        text = userProfile.instrumentsPlayed.joinToString(", ") { it.toString() },
+                        color = Color.Gray,
+                        style = TextStyle(fontSize = 14.sp, fontStyle = FontStyle.Italic)
+                    )
+                }
                 if (Role.MANAGER == userProfile!!.role) {
                     Row (horizontalArrangement = Arrangement.Center) {
                         Text(text = userProfile!!.role.toString() + " ", color = Color.Gray,
@@ -281,7 +288,7 @@ fun UserInfo(
                         Button(onClick = {
                             viewModel.addToContactList(userId)
                             navController.navigate(MusicScreens.ChatScreen.routeWithParameters(userId.toString()))
-                        }, modifier = Modifier
+                        },  colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE)), modifier = Modifier
                             .size(width = 155.dp, height = 40.dp)) {
                             Text(text = "Contact")
                         }
@@ -298,7 +305,7 @@ fun UserInfo(
 @Composable
 fun FollowButton(isFollowing: Boolean, onFollowToggle: () -> Unit) {
     val backgroundColor by animateColorAsState(
-        targetValue = if (isFollowing) Color(0xFFD3D3D3) else MaterialTheme.colorScheme.primary,
+        targetValue = if (isFollowing) Color(0xFFD3D3D3) else androidx.compose.material.MaterialTheme.colors.primary,
         animationSpec = tween(durationMillis = 500), label = ""
     )
     val textColor by animateColorAsState(

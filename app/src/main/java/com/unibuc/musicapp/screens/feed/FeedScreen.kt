@@ -100,6 +100,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
@@ -459,7 +460,7 @@ fun CommentsButton(
                     items(post.comments) { comment ->
                         CommentItem(
                             comment = comment,
-                            userProfilePicture = post.userDto.profilePictureUrl,
+                            userProfilePicture = comment.userProfilePicture,
                             currentUserId = loginViewModel.getUserId(),
                             removeCommentAction = removeCommentAction,
                             post = post,

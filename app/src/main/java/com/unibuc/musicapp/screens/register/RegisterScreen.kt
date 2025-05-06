@@ -36,6 +36,7 @@ import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -268,7 +269,7 @@ fun RegisterForm(
                     permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
                 }
             }
-        }) {
+        },  colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE))) {
             Text("Upload Image")
         }
 
@@ -442,7 +443,7 @@ fun RoleDropdownMenu(selectedRole: Role, onSelectRole: (Role) -> Unit) {
                 readOnly = true,
                 value = selectedRole.toString(),
                 onValueChange = {},
-                label = { Text(text = "Genre", fontWeight = FontWeight.Bold) },
+                label = { Text(text = "Role", fontWeight = FontWeight.Bold) },
                 trailingIcon = {
                     ExposedDropdownMenuDefaults.TrailingIcon(
                         expanded = expanded

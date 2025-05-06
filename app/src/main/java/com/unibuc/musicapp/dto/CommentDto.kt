@@ -9,5 +9,6 @@ data class CommentDto(
     val isLiked: Boolean,
     val username: String,
     val creationTime: Instant,
-    val reactions: List<ReactionDto>
+    val reactions: List<ReactionDto>,
+    val userProfilePicture: String
 )

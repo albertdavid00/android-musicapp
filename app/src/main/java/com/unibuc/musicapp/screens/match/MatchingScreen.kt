@@ -54,6 +54,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.rememberSwipeableState
 import androidx.compose.material.swipeable
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -210,7 +211,8 @@ fun MatchingScreen(
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
                                     Button(
-                                        onClick = { viewModel.dismissMatchDialog() }
+                                        onClick = { viewModel.dismissMatchDialog() },
+                                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE))
                                     ) {
                                         Text("OK")
                                     }

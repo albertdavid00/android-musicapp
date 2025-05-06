@@ -174,6 +174,9 @@ class ProfileViewModel @Inject constructor(private val api: MusicApi,
                         Log.d("User", "Removed post ${post.id}.")
                         val updatedPosts = _userPosts.value!!.filterNot { it.id == post.id }
                         _userPosts.postValue(updatedPosts)
+                        val currentUserInfo = _userInfo.value!!
+                        val updatedUserInfo = currentUserInfo.copy(posts = currentUserInfo.posts - 1)
+                        _userInfo.postValue(updatedUserInfo)
                     } else {
                         Log.d("User", "Failed to delete post, status code: ${response.code()}")
                     }

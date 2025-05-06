@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
+import com.sendbird.android.SendbirdChat
 import com.unibuc.musicapp.data.ErrorResponse
 import com.unibuc.musicapp.dto.LoginDto
 import com.unibuc.musicapp.network.MusicApi
@@ -56,6 +57,7 @@ class LoginViewModel @Inject constructor(private val api: MusicApi,
                 val tokenResponse = api.login(LoginDto(email, password))
                 authRepository.updateToken(tokenResponse)
                 Log.d("Form", tokenResponse.toString())
+                connectUserToSendBird(getUserId())
                 home()
 
             } catch (e: HttpException) {
@@ -90,5 +92,24 @@ class LoginViewModel @Inject constructor(private val api: MusicApi,
     }
     fun dismissErrorDialog() {
         _showErrorDialog.value = false
+    }
+
+    private fun connectUserToSendBird(userId: Long) {
+        _isAuthenticating.value = true
+        SendbirdChat.connect(userId.toString()) { user, e ->
+            if (user != null) {
+                if (e != null) {
+                    _errorMessage.value = e.message.toString()
+                    Log.e("Login", "Error: ${e.message}")
+
+                    // and can be notified through ConnectionHandler.onReconnectSucceeded().
+                } else {
+                    Log.d("Login", "User connected: $user")
+                }
+            } else {
+                _errorMessage.value = e?.message ?: "Unknown error"
+            }
+            _isAuthenticating.value = false
+        }
     }
 }

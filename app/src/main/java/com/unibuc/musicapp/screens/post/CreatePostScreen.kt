@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.ButtonColors
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -36,10 +37,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -135,6 +138,7 @@ fun CreatePostScreen(
                                   }
                         },
                         enabled = valid,
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE))
                     ) {
                         Text(text = "Upload")
                     }
@@ -247,8 +251,15 @@ fun VideoPickerAndRecorder(videoUri: Uri?, onVideoUriChange: (Uri?) -> Unit) {
         .padding(horizontal = 16.dp, vertical = 5.dp),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically) {
-        Button(onClick = { pickVideoLauncher.launch("video/*") }) {
-            Text("Select Video")
+        Button(
+            onClick = { pickVideoLauncher.launch("video/*") },
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE)),
+            modifier = Modifier.border(width = 4.dp, // Border width
+                color = Color(0xFF6200EE), // Border color
+                shape = RoundedCornerShape(30.dp))
+
+        ) {
+            Text("Select Video", fontWeight = FontWeight.Bold)
         }
         Button(onClick = {
             if (hasCameraPermission) {
@@ -261,8 +272,12 @@ fun VideoPickerAndRecorder(videoUri: Uri?, onVideoUriChange: (Uri?) -> Unit) {
                 requestPermissionLauncher.launch(Manifest.permission.CAMERA)
             }
 
-        }) {
-            Text("Record Video")
+        }, colors=ButtonDefaults.buttonColors(containerColor = Color.Red),modifier = Modifier.border(
+            width = 4.dp, // Border width
+            color = Color.Black, // Border color
+            shape = RoundedCornerShape(30.dp) // Border shape
+        )) {
+            Text("Record Video", fontWeight = FontWeight.Bold)
         }
     }
     Column(modifier = Modifier
@@ -397,6 +412,9 @@ fun RadioGroup(selectedVisibility: Visibility, onVisibilitySelected: (Visibility
                 modifier = Modifier.size(40.dp),
                 selected = selectedVisibility == Visibility.PUBLIC,
                 onClick = { onVisibilitySelected(Visibility.PUBLIC) },
+                colors = RadioButtonDefaults.colors(
+                    selectedColor = Color(0xFF6200EE),
+                )
 
                 )
 
@@ -408,6 +426,9 @@ fun RadioGroup(selectedVisibility: Visibility, onVisibilitySelected: (Visibility
                 modifier = Modifier.size(40.dp),
                 selected = selectedVisibility == Visibility.FOLLOWERS,
                 onClick = { onVisibilitySelected(Visibility.FOLLOWERS) },
+                colors = RadioButtonDefaults.colors(
+                    selectedColor = Color(0xFF6200EE),
+                )
             )
         }
 
@@ -417,6 +438,9 @@ fun RadioGroup(selectedVisibility: Visibility, onVisibilitySelected: (Visibility
                 modifier = Modifier.size(40.dp),
                 selected = selectedVisibility == Visibility.PRIVATE,
                 onClick = { onVisibilitySelected(Visibility.PRIVATE) },
+                colors = RadioButtonDefaults.colors(
+                    selectedColor = Color(0xFF6200EE),
+                )
             )
 
         }
